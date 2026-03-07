@@ -1,0 +1,96 @@
+.mag-hero-container > div {
+  max-width: 100%;
+  padding: 0;
+}
+
+.mag-hero {
+  min-height: clamp(48rem, 72vw, 78rem);
+}
+
+.mag-hero .mag-hero-inner {
+  align-items: flex-end;
+  background-image: linear-gradient(90deg, rgb(10 10 10 / 82%), rgb(10 10 10 / 32%)), var(--mag-hero-bg);
+  background-position: center;
+  background-size: cover;
+  border: 0;
+  border-radius: 0;
+  color: #f4f4f1;
+  display: flex;
+  min-height: inherit;
+  overflow: hidden;
+  padding: clamp(2.4rem, 6vw, 5.6rem);
+}
+
+.mag-hero .mag-hero-content {
+  max-width: 68rem;
+}
+
+.mag-hero .mag-hero-eyebrow {
+  color: #e6d29e;
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  margin: 0 0 1.2rem;
+  text-transform: uppercase;
+}
+
+.mag-hero .mag-hero-content h1 {
+  font-size: clamp(3.2rem, 5.4vw, 5.6rem);
+  letter-spacing: 0.03em;
+  line-height: 1.05;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.mag-hero .mag-hero-description {
+  color: #e9e8e2;
+  font-size: clamp(1.6rem, 2.3vw, 2rem);
+  margin: 1.6rem 0 0;
+  max-width: 58ch;
+}
+
+.mag-hero .mag-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+  margin-top: 2.4rem;
+}
+
+.mag-hero .mag-hero-actions .button {
+  align-items: center;
+  background: #bc9453;
+  border: 1px solid #bc9453;
+  border-radius: 0.4rem;
+  color: #0f0f0f;
+  display: inline-flex;
+  font-family: "DIN Condensed", "Arial Narrow", "Franklin Gothic Medium", sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  margin: 0;
+  padding: 0.8rem 1.4rem;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.mag-hero .mag-hero-actions .button.secondary {
+  background: transparent;
+  color: #f3efe6;
+}
+
+.mag-hero .mag-hero-actions .button:hover {
+  background: #a17f47;
+  color: #0f0f0f;
+}
+
+.mag-hero .mag-hero-actions .button.secondary:hover {
+  background: rgb(188 148 83 / 18%);
+  color: #f3efe6;
+}
+
+@media (max-width: 899px) {
+  .mag-hero .mag-hero-inner {
+    align-items: flex-start;
+    min-height: 52rem;
+  }
+}
