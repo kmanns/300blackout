@@ -402,57 +402,6 @@ main > .section:first-of-type {
   }
 }
 
-/* Magpul-inspired visual overrides */
-:root {
-  --color-brand-500: #bc9453;
-  --color-brand-600: #a17f47;
-  --color-brand-700: #8a6a37;
-  --color-neutral-50: #f4f2ed;
-  --color-neutral-100: #ede8de;
-  --color-neutral-800: #ece8df;
-  --color-neutral-900: #f7f5f1;
-  --background-color: #0f0f0f;
-  --type-base-font-family: "DIN Condensed", "Arial Narrow", "Franklin Gothic Medium", sans-serif;
-  --type-display-1-font: normal normal 700 5rem/1.02 var(--type-base-font-family);
-  --type-display-2-font: normal normal 700 4rem/1.05 var(--type-base-font-family);
-  --type-display-3-font: normal normal 700 3rem/1.1 var(--type-base-font-family);
-  --type-headline-1-font: normal normal 700 2.2rem/1.15 var(--type-base-font-family);
-  --type-body-1-default-font: normal normal 400 1.7rem/1.45 "Helvetica Neue", "Segoe UI", sans-serif;
-  --type-body-1-strong-font: normal normal 700 1.7rem/1.45 "Helvetica Neue", "Segoe UI", sans-serif;
-  --type-body-2-default-font: normal normal 400 1.4rem/1.4 "Helvetica Neue", "Segoe UI", sans-serif;
-  --type-body-2-strong-font: normal normal 700 1.4rem/1.4 "Helvetica Neue", "Segoe UI", sans-serif;
-  --type-button-2-font: normal normal 700 1.3rem/1.2 var(--type-base-font-family);
-}
-
-body h1,
-body h2,
-body h3,
-body h4,
-body h5,
-body h6 {
-  color: #f3f1eb;
-  text-transform: uppercase;
-}
-
-body main > .section > div > h2:first-child {
-  border-bottom: 1px solid #46361f;
-  font-size: clamp(2.4rem, 3.5vw, 3.8rem);
-  letter-spacing: 0.06em;
-  margin: 0 0 2rem;
-  padding-bottom: 1rem;
-}
-
-body header .nav-wrapper {
-  background-color: rgb(15 15 15 / 95%);
-  border-bottom: 1px solid #3a3228;
-}
-
-body footer {
-  background: #0d0d0d;
-  border-top: 1px solid #3a3228;
-  color: #d7d0c3;
-}
-
 /* section metadata - styles - start */
 main .section.light,
 main .section.highlight {
