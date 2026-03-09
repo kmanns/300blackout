@@ -1,0 +1,517 @@
+{
+  "definitions": [
+    {
+      "title": "Newsletter",
+      "id": "newsletter",
+      "plugins": {
+        "da": {
+          "unsafeHTML": "<div class=\"newsletter\"><div><div><p>Heading</p></div></div><div><div><p>Subheading</p></div></div></div>"
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "newsletter",
+      "fields": [
+        {
+          "component": "select",
+          "valueType": "string",
+          "name": "align",
+          "label": "Content Alignment",
+          "description": "Horizontal alignment for the text and form",
+          "value": "center",
+          "required": false,
+          "options": [
+            {
+              "name": "Start (logical)",
+              "value": "start"
+            },
+            {
+              "name": "Left",
+              "value": "left"
+            },
+            {
+              "name": "Center",
+              "value": "center"
+            },
+            {
+              "name": "Right",
+              "value": "right"
+            },
+            {
+              "name": "End (logical)",
+              "value": "end"
+            }
+          ]
+        },
+        {
+          "component": "select",
+          "valueType": "string",
+          "name": "backgroundColor",
+          "label": "Background Color",
+          "description": "Use a named variant or override with Section Metadata for custom hex",
+          "value": "neutral",
+          "required": false,
+          "options": [
+            {
+              "name": "Neutral",
+              "value": "neutral"
+            },
+            {
+              "name": "Light",
+              "value": "light"
+            },
+            {
+              "name": "White",
+              "value": "white"
+            },
+            {
+              "name": "Brand",
+              "value": "brand"
+            },
+            {
+              "name": "Dark",
+              "value": "dark"
+            },
+            {
+              "name": "Accent",
+              "value": "accent"
+            }
+          ]
+        },
+        {
+          "component": "select",
+          "valueType": "string",
+          "name": "backgroundStyle",
+          "label": "Background Style",
+          "description": "Visual treatment layered on top of background color",
+          "value": "solid",
+          "required": false,
+          "options": [
+            {
+              "name": "None",
+              "value": "none"
+            },
+            {
+              "name": "Solid",
+              "value": "solid"
+            },
+            {
+              "name": "Subtle Gradient",
+              "value": "subtle-gradient"
+            },
+            {
+              "name": "Mesh Gradient",
+              "value": "mesh-gradient"
+            },
+            {
+              "name": "Noise Texture",
+              "value": "noise-texture"
+            },
+            {
+              "name": "Split Tone",
+              "value": "split-tone"
+            },
+            {
+              "name": "Radial Glow",
+              "value": "radial-glow"
+            },
+            {
+              "name": "Duotone",
+              "value": "duotone"
+            },
+            {
+              "name": "Top Glow",
+              "value": "top-glow"
+            },
+            {
+              "name": "Bottom Fade",
+              "value": "bottom-fade"
+            },
+            {
+              "name": "Diagonal Sweep",
+              "value": "diagonal-sweep"
+            },
+            {
+              "name": "Grid Fade",
+              "value": "grid-fade"
+            },
+            {
+              "name": "Image Wash",
+              "value": "image-wash"
+            }
+          ]
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "backgroundImage",
+          "label": "Background Image URL",
+          "description": "Used when Background Style is Image Wash",
+          "value": "",
+          "required": false
+        },
+        {
+          "component": "select",
+          "valueType": "string",
+          "name": "buttonStyle",
+          "label": "Button Style",
+          "description": "Corner style for the sign up button",
+          "value": "default",
+          "required": false,
+          "options": [
+            {
+              "name": "Default",
+              "value": "default"
+            },
+            {
+              "name": "Pill",
+              "value": "pill"
+            },
+            {
+              "name": "Sharp",
+              "value": "sharp"
+            },
+            {
+              "name": "Soft",
+              "value": "soft"
+            },
+            {
+              "name": "Rounded Large",
+              "value": "rounded-lg"
+            },
+            {
+              "name": "Outline",
+              "value": "outline"
+            },
+            {
+              "name": "Ghost",
+              "value": "ghost"
+            },
+            {
+              "name": "Elevated",
+              "value": "elevated"
+            }
+          ]
+        },
+        {
+          "component": "select",
+          "valueType": "string",
+          "name": "buttonWidth",
+          "label": "Button Width",
+          "description": "Width preset for the sign up button",
+          "value": "medium",
+          "required": false,
+          "options": [
+            {
+              "name": "Auto",
+              "value": "auto"
+            },
+            {
+              "name": "Narrow",
+              "value": "narrow"
+            },
+            {
+              "name": "Medium",
+              "value": "medium"
+            },
+            {
+              "name": "Wide",
+              "value": "wide"
+            },
+            {
+              "name": "Fluid",
+              "value": "fluid"
+            },
+            {
+              "name": "Fit Content",
+              "value": "fit-content"
+            }
+          ]
+        },
+        {
+          "component": "select",
+          "valueType": "string",
+          "name": "density",
+          "label": "Spacing Density",
+          "description": "Adjust vertical rhythm and control height",
+          "value": "comfortable",
+          "required": false,
+          "options": [
+            {
+              "name": "XX-Compact",
+              "value": "xx-compact"
+            },
+            {
+              "name": "Compact",
+              "value": "compact"
+            },
+            {
+              "name": "X-Compact",
+              "value": "x-compact"
+            },
+            {
+              "name": "Comfortable",
+              "value": "comfortable"
+            },
+            {
+              "name": "Spacious",
+              "value": "spacious"
+            },
+            {
+              "name": "X-Spacious",
+              "value": "x-spacious"
+            },
+            {
+              "name": "XX-Spacious",
+              "value": "xx-spacious"
+            },
+            {
+              "name": "Responsive",
+              "value": "responsive"
+            },
+            {
+              "name": "Adaptive",
+              "value": "adaptive"
+            }
+          ]
+        },
+        {
+          "component": "select",
+          "valueType": "string",
+          "name": "formGap",
+          "label": "Form Gap",
+          "description": "Horizontal gap between email field and button",
+          "value": "auto",
+          "required": false,
+          "options": [
+            {
+              "name": "Auto (from Density)",
+              "value": "auto"
+            },
+            {
+              "name": "None",
+              "value": "none"
+            },
+            {
+              "name": "XX-Small",
+              "value": "xxsmall"
+            },
+            {
+              "name": "X-Small",
+              "value": "xsmall"
+            },
+            {
+              "name": "Small",
+              "value": "small"
+            },
+            {
+              "name": "Medium",
+              "value": "medium"
+            },
+            {
+              "name": "Large",
+              "value": "large"
+            },
+            {
+              "name": "X-Large",
+              "value": "xlarge"
+            },
+            {
+              "name": "XX-Large",
+              "value": "xxlarge"
+            }
+          ]
+        },
+        {
+          "component": "select",
+          "valueType": "string",
+          "name": "emailStyle",
+          "label": "Email Field Style",
+          "description": "Visual style for the email input field",
+          "value": "outlined",
+          "required": false,
+          "options": [
+            {
+              "name": "Outlined",
+              "value": "outlined"
+            },
+            {
+              "name": "Filled",
+              "value": "filled"
+            },
+            {
+              "name": "Underlined",
+              "value": "underlined"
+            },
+            {
+              "name": "Pill",
+              "value": "pill"
+            },
+            {
+              "name": "Sharp",
+              "value": "sharp"
+            },
+            {
+              "name": "Minimal",
+              "value": "minimal"
+            },
+            {
+              "name": "Inset",
+              "value": "inset"
+            },
+            {
+              "name": "Soft",
+              "value": "soft"
+            },
+            {
+              "name": "Glass",
+              "value": "glass"
+            },
+            {
+              "name": "High Contrast",
+              "value": "high-contrast"
+            }
+          ]
+        },
+        {
+          "component": "select",
+          "valueType": "string",
+          "name": "buttonColorEmpty",
+          "label": "Button Color (Empty)",
+          "description": "Button color before any email is entered",
+          "value": "muted",
+          "required": false,
+          "options": [
+            {
+              "name": "Muted",
+              "value": "muted"
+            },
+            {
+              "name": "Default",
+              "value": "default"
+            },
+            {
+              "name": "Transparent",
+              "value": "transparent"
+            },
+            {
+              "name": "White",
+              "value": "white"
+            },
+            {
+              "name": "Brand",
+              "value": "brand"
+            },
+            {
+              "name": "Accent",
+              "value": "accent"
+            },
+            {
+              "name": "Dark",
+              "value": "dark"
+            },
+            {
+              "name": "Outline Dark",
+              "value": "outline-dark"
+            },
+            {
+              "name": "Success",
+              "value": "success"
+            },
+            {
+              "name": "Warning",
+              "value": "warning"
+            },
+            {
+              "name": "Negative",
+              "value": "negative"
+            },
+            {
+              "name": "Info",
+              "value": "info"
+            },
+            {
+              "name": "Inherit",
+              "value": "inherit"
+            }
+          ]
+        },
+        {
+          "component": "select",
+          "valueType": "string",
+          "name": "buttonColorFilled",
+          "label": "Button Color (Filled)",
+          "description": "Button color after email text is entered",
+          "value": "dark",
+          "required": false,
+          "options": [
+            {
+              "name": "Muted",
+              "value": "muted"
+            },
+            {
+              "name": "Default",
+              "value": "default"
+            },
+            {
+              "name": "Transparent",
+              "value": "transparent"
+            },
+            {
+              "name": "White",
+              "value": "white"
+            },
+            {
+              "name": "Brand",
+              "value": "brand"
+            },
+            {
+              "name": "Accent",
+              "value": "accent"
+            },
+            {
+              "name": "Dark",
+              "value": "dark"
+            },
+            {
+              "name": "Outline Dark",
+              "value": "outline-dark"
+            },
+            {
+              "name": "Success",
+              "value": "success"
+            },
+            {
+              "name": "Warning",
+              "value": "warning"
+            },
+            {
+              "name": "Negative",
+              "value": "negative"
+            },
+            {
+              "name": "Info",
+              "value": "info"
+            },
+            {
+              "name": "Inherit",
+              "value": "inherit"
+            }
+          ]
+        },
+        {
+          "component": "boolean",
+          "valueType": "boolean",
+          "name": "fullWidth",
+          "label": "Full Width Background",
+          "description": "Expand the newsletter background band to full viewport width",
+          "value": false,
+          "required": false
+        }
+      ]
+    }
+  ],
+  "filters": []
+}

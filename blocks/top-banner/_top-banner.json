@@ -1,0 +1,20 @@
+{
+  "definitions": [
+    {
+      "title": "Top Banner",
+      "id": "top-banner",
+      "plugins": {
+        "da": {
+          "unsafeHTML": "<div class=\"top-banner\"><div><div><p>Message</p></div><div><p></p></div><div><p></p></div><div><p></p></div></div></div>"
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "top-banner",
+      "fields": []
+    }
+  ],
+  "filters": []
+}

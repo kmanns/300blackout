@@ -1,0 +1,20 @@
+{
+  "definitions": [
+    {
+      "title": "Promotional Hero",
+      "id": "promotional-hero",
+      "plugins": {
+        "da": {
+          "unsafeHTML": "<div class=\"promotional-hero\"><div><div><picture><source type=\"image/webp\" srcset=\"\"><source type=\"image/jpeg\" srcset=\"\"><img loading=\"lazy\"></picture></div><div><h2></h2><p></p></div><div><p></p></div></div></div>"
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "promotional-hero",
+      "fields": []
+    }
+  ],
+  "filters": []
+}

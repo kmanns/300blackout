@@ -1,0 +1,257 @@
+/* Circle Carousel Block - Adobe Commerce Storefront Design Pattern */
+
+/* Note: Vertical spacing handled by sections, not blocks (Adobe best practice) */
+
+/* Design tokens for circle carousel */
+:root {
+  --circle-carousel-circle-size: 120px;
+  --circle-carousel-circle-size-mobile: 100px;
+  --circle-carousel-gap: var(--spacing-medium);
+  --circle-carousel-transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.circle-carousel {
+  position: relative;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-small);
+}
+
+/* Container with alignment variants */
+.circle-carousel-container {
+  position: relative;
+  width: 100%;
+}
+
+.circle-carousel-container[data-alignment="left"] {
+  justify-content: flex-start;
+}
+
+.circle-carousel-container[data-alignment="center"] {
+  justify-content: center;
+}
+
+.circle-carousel-container[data-alignment="right"] {
+  justify-content: flex-end;
+}
+
+/* Viewport - visible area with overflow hidden */
+.circle-carousel-viewport {
+  overflow: hidden;
+  width: 100%;
+  padding: var(--spacing-xsmall) 0;
+}
+
+/* Track - container that slides */
+.circle-carousel-track {
+  display: flex;
+  gap: var(--circle-carousel-gap);
+  transition: var(--circle-carousel-transition);
+  will-change: transform;
+}
+
+/* Individual carousel item */
+.circle-carousel-item {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-small);
+  text-align: center;
+}
+
+/* Circle container */
+.circle-carousel-circle {
+  position: relative;
+  width: var(--circle-carousel-circle-size);
+  height: var(--circle-carousel-circle-size);
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: var(--color-neutral-100);
+  border: 3px solid var(--color-neutral-300);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 8%);
+  transition: all 0.3s ease;
+}
+
+.circle-carousel-circle:hover {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 8px 20px rgb(0 0 0 / 12%);
+  border-color: var(--color-brand-500);
+}
+
+/* Image inside circle */
+.circle-carousel-circle picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.circle-carousel-circle img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+/* Text/link below circle */
+.circle-carousel-text {
+  max-width: var(--circle-carousel-circle-size);
+}
+
+.circle-carousel-text a,
+.circle-carousel-text p {
+  display: block;
+  margin: 0;
+  font-size: var(--type-body-1-default-font);
+  letter-spacing: var(--type-body-1-default-letter-spacing);
+  font-weight: 600;
+  color: var(--color-neutral-900);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.circle-carousel-text a:hover {
+  color: var(--color-brand-500);
+  text-decoration: underline;
+}
+
+/* Navigation */
+.circle-carousel-navigation {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-medium);
+  padding: var(--spacing-small) 0;
+}
+
+.circle-carousel-nav-btn {
+  background: var(--color-neutral-50);
+  border: 2px solid var(--color-neutral-300);
+  color: var(--color-neutral-700);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 10px rgb(0 0 0 / 8%);
+  padding: 0;
+}
+
+.circle-carousel-nav-btn svg {
+  width: 22px;
+  height: 22px;
+  stroke: currentcolor;
+}
+
+.circle-carousel-nav-btn:hover {
+  background: var(--color-neutral-50);
+  border-color: var(--color-brand-500);
+  color: var(--color-brand-500);
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 5px 16px rgb(0 0 0 / 12%);
+}
+
+.circle-carousel-nav-btn:active {
+  transform: scale(0.95);
+}
+
+.circle-carousel-nav-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.circle-carousel-indicators {
+  display: flex;
+  gap: var(--spacing-small);
+  align-items: center;
+}
+
+.circle-carousel-indicator {
+  display: flex;
+}
+
+.circle-carousel-indicator button {
+  width: 12px;
+  height: 12px;
+  border-radius: 6px;
+  background-color: var(--color-neutral-300);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+.circle-carousel-indicator button:hover {
+  background-color: var(--color-neutral-500);
+  transform: scale(1.15);
+}
+
+.circle-carousel-indicator.active button {
+  background-color: var(--color-brand-500);
+  width: 24px;
+  height: 12px;
+  border-radius: 6px;
+}
+
+.circle-carousel-indicator button[disabled] {
+  cursor: default;
+}
+
+/* Mobile: 2 items per view */
+@media (max-width: 767px) {
+  :root {
+    --circle-carousel-circle-size: var(--circle-carousel-circle-size-mobile);
+    --circle-carousel-gap: var(--spacing-small);
+  }
+
+  .circle-carousel-item {
+    width: calc(50% - (var(--circle-carousel-gap) / 2));
+  }
+
+  .circle-carousel-text a,
+  .circle-carousel-text p {
+    font-size: var(--type-body-2-default-font);
+    letter-spacing: var(--type-body-2-default-letter-spacing);
+  }
+
+  .circle-carousel-nav-btn {
+    width: 40px;
+    height: 40px;
+  }
+
+  .circle-carousel-nav-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .circle-carousel-indicator button {
+    width: 10px;
+    height: 10px;
+  }
+
+  .circle-carousel-indicator.active button {
+    width: 20px;
+    height: 10px;
+  }
+}
+
+/* Tablet: 4 items per view */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .circle-carousel-item {
+    width: calc(25% - (var(--circle-carousel-gap) * 3 / 4));
+  }
+}
+
+/* Desktop: 6 items per view */
+@media (min-width: 1024px) {
+  .circle-carousel-item {
+    width: calc(16.666% - (var(--circle-carousel-gap) * 5 / 6));
+  }
+}

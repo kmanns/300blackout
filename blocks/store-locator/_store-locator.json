@@ -1,0 +1,305 @@
+{
+  "definitions": [
+    {
+      "title": "Store Locator",
+      "id": "store-locator",
+      "plugins": {
+        "da": {
+          "unsafeHTML": "<div class=\"store-locator\"><div><div><p>Store Name</p></div><div><p>Address</p></div><div><p>City</p></div><div><p>State</p></div><div><p>Zip</p></div><div><p>Phone</p></div></div></div>",
+          "behaviour": "columns"
+        }
+      }
+    },
+    {
+      "title": "Store Locator Item",
+      "id": "store-locator-item",
+      "plugins": {
+        "da": {
+          "unsafeHTML": "<div><div><p>Store Name</p></div><div><p>Address</p></div><div><p>City</p></div><div><p>State</p></div><div><p>Zip</p></div><div><p>Phone</p></div></div>",
+          "behaviour": "columns-row"
+        }
+      }
+    },
+    {
+      "title": "Store Locator Cell",
+      "id": "store-locator-cell",
+      "plugins": {
+        "da": {
+          "unsafeHTML": "<div></div>",
+          "behaviour": "columns-cell"
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "store-locator",
+      "fields": [
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "googleMapsApiKey",
+          "label": "Google Maps API Key",
+          "description": "API key for Maps JavaScript API and Places API (New)",
+          "value": "",
+          "required": false
+        },
+        {
+          "component": "select",
+          "valueType": "string",
+          "name": "defaultView",
+          "label": "Default View",
+          "description": "Initial display layout for the store locator",
+          "value": "split",
+          "required": false,
+          "options": [
+            {
+              "name": "Split View (50/50)",
+              "value": "split"
+            },
+            {
+              "name": "Map Focused (Sidebar)",
+              "value": "map"
+            },
+            {
+              "name": "List Only (No Map)",
+              "value": "list"
+            }
+          ]
+        },
+        {
+          "component": "number",
+          "valueType": "number",
+          "name": "searchRadius",
+          "label": "Search Radius",
+          "description": "Default radius (set 0 for All stores)",
+          "value": 0,
+          "required": false,
+          "validation": {
+            "numberMin": 0,
+            "numberMax": 100
+          }
+        },
+        {
+          "component": "number",
+          "valueType": "number",
+          "name": "maxResults",
+          "label": "Maximum Results",
+          "description": "Maximum number of stores to display",
+          "value": 10,
+          "required": false,
+          "validation": {
+            "numberMin": 5,
+            "numberMax": 50
+          }
+        },
+        {
+          "component": "boolean",
+          "valueType": "boolean",
+          "name": "autoDetect",
+          "label": "Auto-Detect Location",
+          "description": "Automatically use browser geolocation on page load",
+          "value": true,
+          "required": false
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "defaultLocation",
+          "label": "Default Location",
+          "description": "Fallback location if geolocation is denied (e.g., 'Portland, OR')",
+          "value": "Portland, OR",
+          "required": false
+        },
+        {
+          "component": "multiselect",
+          "valueType": "string",
+          "name": "servicesFilter",
+          "label": "Available Service Filters",
+          "description": "Services that users can filter stores by",
+          "value": [
+            "pharmacy",
+            "pickup",
+            "delivery",
+            "24-hour",
+            "deli",
+            "bakery"
+          ],
+          "required": false,
+          "options": [
+            {
+              "name": "Pharmacy",
+              "value": "pharmacy"
+            },
+            {
+              "name": "Pickup",
+              "value": "pickup"
+            },
+            {
+              "name": "Delivery",
+              "value": "delivery"
+            },
+            {
+              "name": "24 Hour",
+              "value": "24-hour"
+            },
+            {
+              "name": "Deli",
+              "value": "deli"
+            },
+            {
+              "name": "Bakery",
+              "value": "bakery"
+            },
+            {
+              "name": "Organic",
+              "value": "organic"
+            },
+            {
+              "name": "Gas Station",
+              "value": "gas-station"
+            }
+          ]
+        },
+        {
+          "component": "select",
+          "valueType": "string",
+          "name": "experienceMode",
+          "label": "Experience Mode",
+          "description": "Fast = lighter payloads; Rich = photos and reviews",
+          "value": "fast",
+          "required": false,
+          "options": [
+            {
+              "name": "Fast",
+              "value": "fast"
+            },
+            {
+              "name": "Rich",
+              "value": "rich"
+            }
+          ]
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "radiusPresets",
+          "label": "Radius Presets",
+          "description": "Comma-separated radius options shown in the UI (example: 0,5,10,25,50)",
+          "value": "0,5,10,25,50",
+          "required": false
+        },
+        {
+          "component": "select",
+          "valueType": "string",
+          "name": "units",
+          "label": "Distance Units",
+          "description": "Unit for distance display and radius filtering",
+          "value": "miles",
+          "required": false,
+          "options": [
+            {
+              "name": "Miles",
+              "value": "miles"
+            },
+            {
+              "name": "Kilometers",
+              "value": "km"
+            }
+          ]
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "noResultsMessage",
+          "label": "No Results Message",
+          "description": "Message shown when no stores match current filters",
+          "value": "No stores found matching your criteria. Please try a different search or remove some filters.",
+          "required": false
+        },
+        {
+          "component": "number",
+          "valueType": "number",
+          "name": "maxReviewsPerStore",
+          "label": "Max Reviews Per Store",
+          "description": "Maximum review count to render in rich details",
+          "value": 5,
+          "required": false,
+          "validation": {
+            "numberMin": 1,
+            "numberMax": 20
+          }
+        },
+        {
+          "component": "select",
+          "valueType": "string",
+          "name": "mapStyle",
+          "label": "Map Style",
+          "description": "Map visual style (uses configured map IDs)",
+          "value": "default",
+          "required": false,
+          "options": [
+            {
+              "name": "Default",
+              "value": "default"
+            },
+            {
+              "name": "Muted",
+              "value": "muted"
+            },
+            {
+              "name": "Minimal",
+              "value": "minimal"
+            }
+          ]
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "primaryCtaLabel",
+          "label": "Primary CTA Label",
+          "description": "Primary action label on store cards and info window links",
+          "value": "Get Directions",
+          "required": false
+        },
+        {
+          "component": "select",
+          "valueType": "string",
+          "name": "cardDensity",
+          "label": "Store Card Density",
+          "description": "Adjust card spacing for list layout",
+          "value": "comfortable",
+          "required": false,
+          "options": [
+            {
+              "name": "Comfortable",
+              "value": "comfortable"
+            },
+            {
+              "name": "Compact",
+              "value": "compact"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "filters": [
+    {
+      "id": "store-locator",
+      "components": [
+        "store-locator-item"
+      ]
+    },
+    {
+      "id": "store-locator-item",
+      "components": []
+    },
+    {
+      "id": "store-locator-cell",
+      "components": [
+        "text"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,131 @@
+{
+  "definitions": [
+    {
+      "title": "Circle Carousel",
+      "id": "circle-carousel",
+      "plugins": {
+        "da": {
+          "unsafeHTML": "<div class=\"circle-carousel\"><div><div><picture><source type=\"image/webp\" srcset=\"\"><source type=\"image/jpeg\" srcset=\"\"><img loading=\"lazy\"></picture></div><div><p></p></div></div></div>",
+          "behaviour": "columns"
+        }
+      }
+    },
+    {
+      "title": "Circle Carousel Item",
+      "id": "circle-carousel-item",
+      "plugins": {
+        "da": {
+          "unsafeHTML": "<div><div><picture><source type=\"image/webp\" srcset=\"\"><source type=\"image/jpeg\" srcset=\"\"><img loading=\"lazy\"></picture></div><div><p></p></div></div>",
+          "behaviour": "columns-row"
+        }
+      }
+    },
+    {
+      "title": "Circle Carousel Cell",
+      "id": "circle-carousel-cell",
+      "plugins": {
+        "da": {
+          "unsafeHTML": "<div></div>",
+          "behaviour": "columns-cell"
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "circle-carousel",
+      "fields": [
+        {
+          "component": "select",
+          "valueType": "string",
+          "name": "alignment",
+          "label": "Alignment",
+          "description": "Horizontal alignment of the carousel",
+          "value": "center",
+          "required": false,
+          "options": [
+            {
+              "name": "Left",
+              "value": "left"
+            },
+            {
+              "name": "Center",
+              "value": "center"
+            },
+            {
+              "name": "Right",
+              "value": "right"
+            }
+          ]
+        },
+        {
+          "component": "boolean",
+          "valueType": "boolean",
+          "name": "autoplay",
+          "label": "Enable Autoplay",
+          "description": "Automatically cycle through items every 4 seconds",
+          "value": true,
+          "required": false
+        },
+        {
+          "component": "number",
+          "valueType": "number",
+          "name": "itemsMobile",
+          "label": "Items Per View (Mobile)",
+          "description": "Number of circles visible on mobile screens",
+          "value": 2,
+          "required": false,
+          "validation": {
+            "numberMin": 1,
+            "numberMax": 4
+          }
+        },
+        {
+          "component": "number",
+          "valueType": "number",
+          "name": "itemsTablet",
+          "label": "Items Per View (Tablet)",
+          "description": "Number of circles visible on tablet screens",
+          "value": 4,
+          "required": false,
+          "validation": {
+            "numberMin": 2,
+            "numberMax": 6
+          }
+        },
+        {
+          "component": "number",
+          "valueType": "number",
+          "name": "itemsDesktop",
+          "label": "Items Per View (Desktop)",
+          "description": "Number of circles visible on desktop screens",
+          "value": 6,
+          "required": false,
+          "validation": {
+            "numberMin": 3,
+            "numberMax": 8
+          }
+        }
+      ]
+    }
+  ],
+  "filters": [
+    {
+      "id": "circle-carousel",
+      "components": [
+        "circle-carousel-item"
+      ]
+    },
+    {
+      "id": "circle-carousel-item",
+      "components": []
+    },
+    {
+      "id": "circle-carousel-cell",
+      "components": [
+        "text",
+        "image"
+      ]
+    }
+  ]
+}
