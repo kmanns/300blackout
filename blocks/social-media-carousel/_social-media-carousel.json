@@ -1,0 +1,20 @@
+{
+  "definitions": [
+    {
+      "title": "Social Media Carousel",
+      "id": "social-media-carousel",
+      "plugins": {
+        "da": {
+          "unsafeHTML": "<div class=\"social-media-carousel\"><div><div><p>Instagram</p></div><div><p><a href=\"https://www.instagram.com/p/ABC123\">https://www.instagram.com/p/ABC123</a></p></div><div><p>Caption</p></div></div><div><div><p>YouTube Shorts</p></div><div><p><a href=\"https://www.youtube.com/shorts/ABC123\">https://www.youtube.com/shorts/ABC123</a></p></div><div><p>Caption</p></div></div></div>"
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "social-media-carousel",
+      "fields": []
+    }
+  ],
+  "filters": []
+}

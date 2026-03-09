@@ -1,0 +1,20 @@
+{
+  "definitions": [
+    {
+      "title": "Age Gate",
+      "id": "age-gate",
+      "plugins": {
+        "da": {
+          "unsafeHTML": "<div class=\"age-gate\"><div><div><p>Headline</p></div><div><p>Message</p></div></div><div><div><p>Confirm Label</p></div><div><p>I am 18 or older</p></div></div><div><div><p>Deny Label</p></div><div><p>Exit</p></div></div><div><div><p>Exit URL</p></div><div><p>https://www.google.com</p></div></div></div>"
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "age-gate",
+      "fields": []
+    }
+  ],
+  "filters": []
+}
