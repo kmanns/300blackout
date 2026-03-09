@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="script-src 'nonce-aem' 'strict-dynamic' 'unsafe-inline' http: https:; base-uri 'self'; object-src 'none';"
+      move-to-http-header="true"
+    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blackout Tactical Demo Storefront</title>
+    <meta name="description" content="Demo storefront for Adobe Commerce as a Cloud Service with Edge Delivery Services.">
+    <meta property="og:title" content="Blackout Tactical Demo Storefront">
+    <meta property="og:description" content="Premium firearms accessories demo experience.">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1610641818989-c2051b5e2cfd?auto=format&fit=crop&w=1400&q=80">
+
+    <script nonce="aem" type="importmap">
+      {
+        "imports": {
+          "@dropins/storefront-account/": "/scripts/__dropins__/storefront-account/",
+          "@dropins/storefront-auth/": "/scripts/__dropins__/storefront-auth/",
+          "@dropins/storefront-cart/": "/scripts/__dropins__/storefront-cart/",
+          "@dropins/storefront-checkout/": "/scripts/__dropins__/storefront-checkout/",
+          "@dropins/storefront-order/": "/scripts/__dropins__/storefront-order/",
+          "@dropins/storefront-payment-services/": "/scripts/__dropins__/storefront-payment-services/",
+          "@dropins/storefront-pdp/": "/scripts/__dropins__/storefront-pdp/",
+          "@dropins/storefront-recommendations/": "/scripts/__dropins__/storefront-recommendations/",
+          "@dropins/storefront-wishlist/": "/scripts/__dropins__/storefront-wishlist/",
+          "@dropins/storefront-personalization/": "/scripts/__dropins__/storefront-personalization/",
+          "@dropins/storefront-product-discovery/": "/scripts/__dropins__/storefront-product-discovery/",
+          "@dropins/tools/": "/scripts/__dropins__/tools/"
+        }
+      }
+    </script>
+
+    <link rel="stylesheet" href="/styles/styles.css">
+    <script nonce="aem" type="module" src="/scripts/aem.js"></script>
+    <script nonce="aem" type="module" src="/scripts/scripts.js"></script>
+    <script nonce="aem" type="module" src="/scripts/commerce.js"></script>
+  </head>
+  <body>
+    <header></header>
+    <main>
+      <div>
+        <div class="top-banner">
+          <div>
+            <div>Message</div>
+            <div><p>Free shipping on orders over $150. Built for hard use.</p></div>
+            <div><p><a href="/products">Shop Accessories</a></p></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="age-gate">
+          <div>
+            <div>Headline</div>
+            <div>Verify Your Age</div>
+          </div>
+          <div>
+            <div>Message</div>
+            <div>This site contains firearm accessory content intended only for adults 18 and older.</div>
+          </div>
+          <div>
+            <div>Legal Copy</div>
+            <div>By entering, you confirm you meet your local legal age requirements and agree to responsible ownership practices.</div>
+          </div>
+          <div>
+            <div>Confirm Label</div>
+            <div>I am 18 or older</div>
+          </div>
+          <div>
+            <div>Deny Label</div>
+            <div>Leave Site</div>
+          </div>
+          <div>
+            <div>Exit URL</div>
+            <div><a href="https://www.adobe.com/">https://www.adobe.com/</a></div>
+          </div>
+          <div>
+            <div>Min Age</div>
+            <div>18</div>
+          </div>
+          <div>
+            <div>Storage Key</div>
+            <div>blackout-demo-age-gate</div>
+          </div>
+          <div>
+            <div>Background Image</div>
+            <div><picture><img src="https://images.unsplash.com/photo-1595590424283-b8f17842773f?auto=format&fit=crop&w=1600&q=80" alt="Carbon-fiber firearm accessory detail"></picture></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="hero">
+          <div>
+            <div><picture><img src="https://images.unsplash.com/photo-1610641818989-c2051b5e2cfd?auto=format&fit=crop&w=1800&q=80" alt="Premium tactical rifle accessory setup"></picture></div>
+            <div>
+              <h1>Purpose-Built Accessories for Real-World Conditions</h1>
+              <p>Engineered stocks, grips, slings, and mounting systems tuned for reliability, modularity, and clean deployment.</p>
+              <p><a href="/products" class="button">Explore the Lineup</a></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="default-content-wrapper">
+          <h2>Featured Categories</h2>
+          <p>Core accessories that complete your platform.</p>
+        </div>
+        <div class="cards">
+          <div>
+            <div><picture><img src="https://images.unsplash.com/photo-1606248897732-2c5ffe759c04?auto=format&fit=crop&w=1100&q=80" alt="Stocks and braces"></picture></div>
+            <div>
+              <h3>Stocks & Braces</h3>
+              <p>Stable cheek weld, rugged lockup, and lightweight profiles.</p>
+              <p><a href="/products/stocks">View Products</a></p>
+            </div>
+          </div>
+          <div>
+            <div><picture><img src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1100&q=80" alt="Rail systems and handguards"></picture></div>
+            <div>
+              <h3>Rails & Handguards</h3>
+              <p>Low-profile mounting surfaces with modern ergonomics.</p>
+              <p><a href="/products/rails">View Products</a></p>
+            </div>
+          </div>
+          <div>
+            <div><picture><img src="https://images.unsplash.com/photo-1511882150382-421056c89033?auto=format&fit=crop&w=1100&q=80" alt="Slings and hardware"></picture></div>
+            <div>
+              <h3>Slings & Hardware</h3>
+              <p>Mission-adaptable carry options for range and duty use.</p>
+              <p><a href="/products/slings">View Products</a></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="default-content-wrapper">
+          <h2>From the Feed</h2>
+          <p>Product drops, setup videos, and live range clips.</p>
+        </div>
+        <div class="social-media-carousel">
+          <div>
+            <div>Instagram</div>
+            <div><a href="https://www.instagram.com/p/C0WlQx2N4wW/">https://www.instagram.com/p/C0WlQx2N4wW/</a></div>
+            <div>New handguard release in forged black finish.</div>
+          </div>
+          <div>
+            <div>YouTube Shorts</div>
+            <div><a href="https://www.youtube.com/shorts/aqz-KE-bpKQ">https://www.youtube.com/shorts/aqz-KE-bpKQ</a></div>
+            <div>Quick install: low-profile sling mount in under 60 seconds.</div>
+          </div>
+          <div>
+            <div>Instagram</div>
+            <div><a href="https://www.instagram.com/p/Cx4s1u7uTRx/">https://www.instagram.com/p/Cx4s1u7uTRx/</a></div>
+            <div>Build highlight: 300 BLK setup with lightweight stock and vertical grip.</div>
+          </div>
+          <div>
+            <div>YouTube Shorts</div>
+            <div><a href="https://youtu.be/dQw4w9WgXcQ">https://youtu.be/dQw4w9WgXcQ</a></div>
+            <div>Field test clip: recoil control and rapid transitions.</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="default-content-wrapper">
+          <h2>Dealer-Ready Commerce Demo</h2>
+          <p>This page is structured to demo Adobe Commerce Cloud Service + Edge Delivery blocks, merchandising, and conversion-focused storytelling.</p>
+          <p><a href="/products" class="button secondary">Open Product Catalog</a></p>
+        </div>
+      </div>
+    </main>
+    <footer></footer>
+  </body>
+</html>
