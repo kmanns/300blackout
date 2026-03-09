@@ -302,7 +302,7 @@ button.button {
   display: inline-block;
   max-width: 100%;
   margin: var(--spacing-small) 0;
-  border: var(--shape-border-width-3) solid #7f5a29;
+  border: var(--shape-border-width-3) solid #990D21;
   border-radius: 0;
   padding: 0.7em 1.35em;
   font: var(--type-button-2-font);
@@ -312,8 +312,8 @@ button.button {
   line-height: 1.25;
   text-align: center;
   text-decoration: none;
-  background: linear-gradient(90deg, #7f5a29, #bf8b3f);
-  color: #111316;
+  background: #990D21;
+  color: #fff;
   cursor: pointer;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -325,8 +325,8 @@ main a.button:hover,
 main a.button:focus,
 button.button:hover,
 button.button:focus {
-  background: linear-gradient(90deg, #956a31, #d6a356);
-  border-color: #d6a356;
+  background: #7b0b1b;
+  border-color: #7b0b1b;
   cursor: pointer;
 }
 
@@ -339,14 +339,16 @@ button.button:disabled:hover {
 
 main a.button.secondary,
 button.button.secondary {
-  background-color: unset;
-  border: var(--shape-border-width-3) solid currentcolor;
-  color: #7f5a29;
+  background-color: #000;
+  border: var(--shape-border-width-3) solid #000;
+  color: #fff;
 }
 
 main a.button.secondary:hover,
 button.button.secondary:hover {
-  color: var(--color-brand-600);
+  background-color: #222;
+  border-color: #222;
+  color: #fff;
 }
 
 main input:hover {

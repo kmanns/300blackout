@@ -94,20 +94,22 @@
 }
 
 .age-gate .age-gate-actions .age-gate-confirm {
-  background: linear-gradient(90deg, #7f5a29, #bf8b3f);
-  border-color: #bf8b3f;
-  color: #101214;
+  background: #990D21;
+  border-color: #990D21;
+  color: #fff;
   font-weight: 700;
   text-transform: uppercase;
 }
 
 .age-gate .age-gate-actions .age-gate-confirm:hover,
 .age-gate .age-gate-actions .age-gate-confirm:focus-visible {
-  background: linear-gradient(90deg, #9d7136, #d6a356);
-  border-color: #d6a356;
+  background: #7b0b1b;
+  border-color: #7b0b1b;
 }
 
 .age-gate .age-gate-actions .age-gate-deny {
+  background: #000;
+  border-color: #000;
   color: var(--color-neutral-50);
 }
 
