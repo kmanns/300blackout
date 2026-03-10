@@ -1,7 +1,7 @@
 {
   "public": {
     "default": {
-      "commerce-core-endpoint": "https://com532.adobedemo.com/graphql",
+      "commerce-core-endpoint": "https://edge-sandbox-graph.adobe.io/api/a760f8da-57c8-45cc-bdbb-82ab856fbd2f/graphql",
       "commerce-endpoint": "https://edge-sandbox-graph.adobe.io/api/a760f8da-57c8-45cc-bdbb-82ab856fbd2f/graphql",
       "adobe-commerce-optimizer": false,
       "commerce-assets-enabled": true,
