@@ -20,7 +20,7 @@ import{Initializer as T,Config as S}from"@dropins/tools/lib.js";import{events as
       group_id
     }
   }
-`,z=async(e="Authorization",t="Bearer")=>{const r=P(E.auth_dropin_user_token);return r?(I(e,`${t} ${r}`),l(U).then(async o=>{var n,i,u,m;return!((n=o.errors)!=null&&n.find(_=>{var c;return((c=_.extensions)==null?void 0:c.category)==="graphql-authentication"}))?(await C((m=(u=(i=o.data)==null?void 0:i.customer)==null?void 0:u.group_id)!=null?btoa(String(m)):""),s.emit("authenticated",!0),!0):(R(E.auth_dropin_user_token),k(e),await C(),s.emit("authenticated",!1),!1)})):(await C(),s.emit("authenticated",!1),!1)},D=`
+`,z=async(e="Authorization",t="Bearer")=>{const r=P(E.auth_dropin_user_token);return r?(I(e,`${t} ${r}`),l(U,{method:"POST",cache:"no-cache"}).then(async o=>{var n,i,u,m;return!((n=o.errors)!=null&&n.find(_=>{var c;return((c=_.extensions)==null?void 0:c.category)==="graphql-authentication"||((c=_.extensions)==null?void 0:c.category)==="graphql-authorization"}))?(await C((m=(u=(i=o.data)==null?void 0:i.customer)==null?void 0:u.group_id)!=null?btoa(String(m)):""),s.emit("authenticated",!0),!0):(R(E.auth_dropin_user_token),k(e),await C(),s.emit("authenticated",!1),!1)})):(await C(),s.emit("authenticated",!1),!1)},D=`
   query GET_CUSTOMER_ROLE_PERMISSIONS {
     customer {
       purchase_orders_enabled

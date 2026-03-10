@@ -7,7 +7,7 @@ import{a as y,f as G,h as R}from"./network-error.js";import"@dropins/tools/recap
     }
   }
   ${S}
-`,n=async t=>{if(t){const{authHeaderConfig:i}=k.getConfig();y(i.header,i.tokenPrefix?`${i.tokenPrefix} ${t}`:t)}return await G(Q,{method:"GET",cache:"force-cache"}).then(i=>A(i)).catch(R)},q=`
+`,n=async t=>{if(t){const{authHeaderConfig:i}=k.getConfig();y(i.header,i.tokenPrefix?`${i.tokenPrefix} ${t}`:t)}return await G(Q,{method:"POST",cache:"no-cache"}).then(i=>A(i)).catch(R)},q=`
   mutation GET_CUSTOMER_TOKEN($email: String!, $password: String!) {
     generateCustomerToken(email: $email, password: $password) {
       token
