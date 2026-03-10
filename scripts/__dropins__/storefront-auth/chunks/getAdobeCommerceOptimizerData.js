@@ -17,12 +17,13 @@ import{Initializer as T,Config as S}from"@dropins/tools/lib.js";import{events as
 `,x=async()=>await l(G,{method:"GET",cache:"force-cache"}).then(e=>{var t;return(t=e.errors)!=null&&t.length?b(e.errors):M(e)}).catch(y),U=`
   query VALIDATE_TOKEN {
     customer {
-      group {
-        uid
+      group_id
+      role {
+        id
       }
     }
   }
-`,z=async(e="Authorization",t="Bearer")=>{const r=P(E.auth_dropin_user_token);return r?(I(e,`${t} ${r}`),l(U).then(async o=>{var n,i,u,m;return!((n=o.errors)!=null&&n.find(_=>{var d;return((d=_.extensions)==null?void 0:d.category)==="graphql-authentication"}))?(await C((m=(u=(i=o.data)==null?void 0:i.customer)==null?void 0:u.group)==null?void 0:m.uid),s.emit("authenticated",!0),!0):(R(E.auth_dropin_user_token),k(e),await C(),s.emit("authenticated",!1),!1)})):(await C(),s.emit("authenticated",!1),!1)},D=`
+`,z=async(e="Authorization",t="Bearer")=>{const r=P(E.auth_dropin_user_token);return r?(I(e,`${t} ${r}`),l(U).then(async o=>{var n,i,u,m,c,a,d;return!((n=o.errors)!=null&&n.find(_=>{var h;return((h=_.extensions)==null?void 0:h.category)==="graphql-authentication"}))?(await C((m=(u=(i=o.data)==null?void 0:i.customer)==null?void 0:u.group_id)!=null?btoa(String(m)):((d=(a=(c=o.data)==null?void 0:c.customer)==null?void 0:a.role)==null?void 0:d.id)),s.emit("authenticated",!0),!0):(R(E.auth_dropin_user_token),k(e),await C(),s.emit("authenticated",!1),!1)})):(await C(),s.emit("authenticated",!1),!1)},D=`
   query GET_CUSTOMER_ROLE_PERMISSIONS {
     customer {
       purchase_orders_enabled

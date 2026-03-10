@@ -6,8 +6,9 @@ const e=`
     firstname
     lastname
     email
-    group {
-      uid
+    group_id
+    role {
+      id
     }
   }
 `;export{e as CUSTOMER_INFORMATION_FRAGMENT};
