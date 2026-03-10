@@ -13,7 +13,7 @@
           "Magento-Customer-Group": "",
           "Magento-Store-Code": "main_website_store",
           "Magento-Store-View-Code": "default",
-          "Magento-Website-Code": "website",
+          "Magento-Website-Code": "base",
           "x-api-key": "6e8c20e486e243eaadae963ae2418b53",
           "Magento-Environment-Id": "c9d317c4-f799-4ebf-8a9e-2b4712539390"
         }
