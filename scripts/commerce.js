@@ -628,8 +628,8 @@ export async function commerceEndpointWithQueryParams() {
  */
 function getSkuFromUrl() {
   const path = window.location.pathname;
-  const result = path.match(/\/products\/[\w|-]+\/([\w|-]+)$/);
-  return result?.[1];
+  const result = path.match(/\/products\/(?:[\w|-]+\/)?([\w|-]+)$/);
+  return result?.[1] || null;
 }
 
 /**
@@ -674,7 +674,16 @@ export function getProductLink(urlKey, sku) {
   }
   const sanitizedUrlKey = urlKey ? sanitizeName(urlKey) : '';
   const sanitizedSku = sku ? sanitizeName(sku) : '';
-  return rootLink(`/products/${sanitizedUrlKey}/${sanitizedSku}`);
+  if (sanitizedUrlKey && sanitizedSku) {
+    return rootLink(`/products/${sanitizedUrlKey}/${sanitizedSku}`);
+  }
+  if (sanitizedSku) {
+    return rootLink(`/products/${sanitizedSku}`);
+  }
+  if (sanitizedUrlKey) {
+    return rootLink(`/products/${sanitizedUrlKey}`);
+  }
+  return rootLink('/products');
 }
 
 /**
