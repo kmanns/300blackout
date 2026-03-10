@@ -7,9 +7,6 @@ const e=`
     lastname
     email
     group_id
-    role {
-      id
-    }
   }
 `;export{e as CUSTOMER_INFORMATION_FRAGMENT};
 //# sourceMappingURL=fragments.js.map
