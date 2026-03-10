@@ -1,7 +1,7 @@
 // Drop-in Tools
 import { events } from '@dropins/tools/event-bus.js';
 
-import { tryRenderAemAssetsImage } from '@dropins/tools/lib/aem/assets.js';
+import { isAemAssetsEnabled, tryRenderAemAssetsImage } from '@dropins/tools/lib/aem/assets.js';
 import { getMetadata } from '../../scripts/aem.js';
 import { loadFragment } from '../fragment/fragment.js';
 import { fetchPlaceholders, getProductLink, rootLink } from '../../scripts/commerce.js';
@@ -128,6 +128,25 @@ function toggleMenu(nav, navSections, forceExpanded = null) {
 const subMenuHeader = document.createElement('div');
 subMenuHeader.classList.add('submenu-header');
 subMenuHeader.innerHTML = '<h5 class="back-link">All Categories</h5><hr />';
+
+function renderStandardProductImage(ctx, href) {
+  const { defaultImageProps } = ctx;
+  const anchorWrapper = document.createElement('a');
+  anchorWrapper.href = href;
+
+  const image = document.createElement('img');
+  if (defaultImageProps.alt) image.alt = defaultImageProps.alt;
+  if (defaultImageProps.title) image.title = defaultImageProps.title;
+  if (defaultImageProps.width) image.width = defaultImageProps.width;
+  if (defaultImageProps.height) image.height = defaultImageProps.height;
+  if (defaultImageProps.loading) image.loading = defaultImageProps.loading;
+  if (defaultImageProps.src) image.src = defaultImageProps.src;
+  if (defaultImageProps.srcSet) image.srcset = defaultImageProps.srcSet;
+  image.className = 'dropin-image';
+
+  anchorWrapper.append(image);
+  ctx.replaceWith(anchorWrapper);
+}
 
 /**
  * Sets up the submenu
@@ -386,8 +405,15 @@ export default async function decorate(block) {
           slots: {
             ProductImage: (ctx) => {
               const { product, defaultImageProps } = ctx;
+              const productLink = getProductLink(product.urlKey, product.sku);
+
+              if (!defaultImageProps.src || !isAemAssetsEnabled()) {
+                renderStandardProductImage(ctx, productLink);
+                return;
+              }
+
               const anchorWrapper = document.createElement('a');
-              anchorWrapper.href = getProductLink(product.urlKey, product.sku);
+              anchorWrapper.href = productLink;
 
               tryRenderAemAssetsImage(ctx, {
                 alias: product.sku,
@@ -398,6 +424,10 @@ export default async function decorate(block) {
                   height: defaultImageProps.height,
                 },
               });
+
+              if (!anchorWrapper.firstElementChild) {
+                renderStandardProductImage(ctx, productLink);
+              }
             },
             Footer: async (ctx) => {
               // View all results button

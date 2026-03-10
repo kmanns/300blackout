@@ -11,7 +11,7 @@ import { WishlistToggle } from '@dropins/storefront-wishlist/containers/Wishlist
 import { render as wishlistRender } from '@dropins/storefront-wishlist/render.js';
 // Cart Dropin
 import * as cartApi from '@dropins/storefront-cart/api.js';
-import { tryRenderAemAssetsImage } from '@dropins/tools/lib/aem/assets.js';
+import { isAemAssetsEnabled, tryRenderAemAssetsImage } from '@dropins/tools/lib/aem/assets.js';
 // Event Bus
 import { events } from '@dropins/tools/event-bus.js';
 // AEM
@@ -21,6 +21,25 @@ import { fetchPlaceholders, getProductLink } from '../../scripts/commerce.js';
 // Initializers
 import '../../scripts/initializers/search.js';
 import '../../scripts/initializers/wishlist.js';
+
+function renderStandardProductImage(ctx, href) {
+  const { defaultImageProps } = ctx;
+  const anchorWrapper = document.createElement('a');
+  anchorWrapper.href = href;
+
+  const image = document.createElement('img');
+  if (defaultImageProps.alt) image.alt = defaultImageProps.alt;
+  if (defaultImageProps.title) image.title = defaultImageProps.title;
+  if (defaultImageProps.width) image.width = defaultImageProps.width;
+  if (defaultImageProps.height) image.height = defaultImageProps.height;
+  if (defaultImageProps.loading) image.loading = defaultImageProps.loading;
+  if (defaultImageProps.src) image.src = defaultImageProps.src;
+  if (defaultImageProps.srcSet) image.srcset = defaultImageProps.srcSet;
+  image.className = 'dropin-image';
+
+  anchorWrapper.append(image);
+  ctx.replaceWith(anchorWrapper);
+}
 
 export default async function decorate(block) {
   const labels = await fetchPlaceholders();
@@ -147,8 +166,15 @@ export default async function decorate(block) {
       slots: {
         ProductImage: (ctx) => {
           const { product, defaultImageProps } = ctx;
+          const productLink = getProductLink(product.urlKey, product.sku);
+
+          if (!defaultImageProps.src || !isAemAssetsEnabled()) {
+            renderStandardProductImage(ctx, productLink);
+            return;
+          }
+
           const anchorWrapper = document.createElement('a');
-          anchorWrapper.href = getProductLink(product.urlKey, product.sku);
+          anchorWrapper.href = productLink;
 
           tryRenderAemAssetsImage(ctx, {
             alias: product.sku,
@@ -159,6 +185,10 @@ export default async function decorate(block) {
               height: defaultImageProps.height,
             },
           });
+
+          if (!anchorWrapper.firstElementChild) {
+            renderStandardProductImage(ctx, productLink);
+          }
         },
         ProductActions: (ctx) => {
           const actionsWrapper = document.createElement('div');
