@@ -59,11 +59,27 @@ function createAmount(price) {
 function mapTypeName(typeName, fallbackTypeName) {
   if (!typeName) return fallbackTypeName;
 
-  if (typeName === 'SimpleProduct' || typeName === 'VirtualProduct' || typeName === 'DownloadableProduct') {
+  if (
+    typeName === 'SimpleProduct'
+    || typeName === 'VirtualProduct'
+    || typeName === 'DownloadableProduct'
+  ) {
     return 'SimpleProductView';
   }
 
   return 'ComplexProductView';
+}
+
+function needsProductCardFallback(product) {
+  return Boolean(
+    product?.sku
+    && (
+      !product.name
+      || !product.urlKey
+      || !product.images?.length
+      || (!product.price && !product.priceRange)
+    ),
+  );
 }
 
 function mapFallbackProduct(item, product) {
@@ -79,8 +95,8 @@ function mapFallbackProduct(item, product) {
   return {
     ...product,
     name: item.name || product.name || product.sku || '',
-    urlKey: item.url_key || product.urlKey || '',
     url: item.url_key ? `/${item.url_key}` : (product.url || ''),
+    urlKey: item.url_key || product.urlKey || '',
     images: imageUrl ? [{
       label: imageLabel,
       roles: ['image'],
@@ -106,47 +122,83 @@ function mapFallbackProduct(item, product) {
   };
 }
 
-export function needsProductCardFallback(product) {
-  return Boolean(
-    product?.sku
-    && (
-      !product.name
-      || !product.urlKey
-      || !product.images?.length
-      || (!product.price && !product.priceRange)
-    ),
-  );
+async function fetchFallbackProducts(skus) {
+  const uncachedSkus = skus.filter((sku) => !hydratedProducts.has(sku));
+  if (uncachedSkus.length > 0) {
+    const request = CORE_FETCH_GRAPHQL.fetchGraphQl(PRODUCT_CARD_FALLBACK_QUERY, {
+      variables: { skus: uncachedSkus },
+      cache: 'no-cache',
+    }).then((response) => {
+      if (response?.errors?.length) {
+        throw new Error(response.errors.map((error) => error.message).join(' '));
+      }
+
+      const items = response?.data?.products?.items || [];
+      const itemMap = new Map(items.map((item) => [item.sku, item]));
+
+      uncachedSkus.forEach((sku) => {
+        hydratedProducts.set(sku, itemMap.get(sku) || null);
+      });
+
+      return itemMap;
+    }).catch((error) => {
+      console.warn('Failed to hydrate fallback search results', error);
+      uncachedSkus.forEach((sku) => {
+        hydratedProducts.set(sku, null);
+      });
+      return new Map();
+    });
+
+    uncachedSkus.forEach((sku) => {
+      hydratedProducts.set(sku, request.then((itemMap) => itemMap.get(sku) || null));
+    });
+  }
+
+  const resolvedEntries = await Promise.all(skus.map(async (sku) => {
+    const cachedValue = hydratedProducts.get(sku);
+    const resolvedValue = cachedValue instanceof Promise ? await cachedValue : cachedValue;
+    hydratedProducts.set(sku, resolvedValue || null);
+    return [sku, resolvedValue || null];
+  }));
+
+  return new Map(resolvedEntries);
 }
 
-export async function hydrateProductCard(product) {
-  if (!needsProductCardFallback(product)) {
-    return product;
+export async function hydrateProductSearchResponse(request, response) {
+  const searchItems = response?.data?.productSearch?.items;
+  if (!Array.isArray(searchItems) || searchItems.length === 0) {
+    return response;
   }
 
-  const cachedProduct = hydratedProducts.get(product.sku);
-  if (cachedProduct) {
-    return cachedProduct;
+  if (!request?.body?.includes('productSearch')) {
+    return response;
   }
 
-  const pendingRequest = CORE_FETCH_GRAPHQL.fetchGraphQl(PRODUCT_CARD_FALLBACK_QUERY, {
-    variables: { skus: [product.sku] },
-    cache: 'no-cache',
-  }).then((response) => {
-    if (response?.errors?.length) {
-      throw new Error(response.errors.map((error) => error.message).join(' '));
+  const productsToHydrate = searchItems
+    .map(({ productView }) => productView)
+    .filter(needsProductCardFallback);
+
+  if (productsToHydrate.length === 0) {
+    return response;
+  }
+
+  const fallbackMap = await fetchFallbackProducts(
+    [...new Set(productsToHydrate.map(({ sku }) => sku))],
+  );
+
+  response.data.productSearch.items = searchItems.map((item) => {
+    const product = item.productView;
+    const fallbackProduct = fallbackMap.get(product?.sku);
+
+    if (!product || !fallbackProduct) {
+      return item;
     }
 
-    const item = response?.data?.products?.items?.find(({ sku }) => sku === product.sku);
-    const hydratedProduct = item ? mapFallbackProduct(item, product) : product;
-
-    hydratedProducts.set(product.sku, hydratedProduct);
-    return hydratedProduct;
-  }).catch((error) => {
-    console.warn(`Failed to hydrate fallback product data for SKU ${product.sku}`, error);
-    hydratedProducts.set(product.sku, product);
-    return product;
+    return {
+      ...item,
+      productView: mapFallbackProduct(fallbackProduct, product),
+    };
   });
 
-  hydratedProducts.set(product.sku, pendingRequest);
-  return pendingRequest;
+  return response;
 }

@@ -2,10 +2,18 @@ import { initializers } from '@dropins/tools/initializer.js';
 import { initialize, setEndpoint } from '@dropins/storefront-product-discovery/api.js';
 import { initializeDropin } from './index.js';
 import { CS_FETCH_GRAPHQL, fetchPlaceholders } from '../commerce.js';
+import { hydrateProductSearchResponse } from '../product-search-fallback.js';
+
+let searchHydrationHookRegistered = false;
 
 await initializeDropin(async () => {
   // Inherit Fetch GraphQL Instance (Catalog Service)
   setEndpoint(CS_FETCH_GRAPHQL);
+
+  if (!searchHydrationHookRegistered) {
+    CS_FETCH_GRAPHQL.addAfterHook(hydrateProductSearchResponse);
+    searchHydrationHookRegistered = true;
+  }
 
   // Fetch placeholders
   const labels = await fetchPlaceholders('placeholders/search.json');
