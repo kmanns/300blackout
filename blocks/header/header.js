@@ -1,8 +1,8 @@
 // Drop-in Tools
 import { events } from '@dropins/tools/event-bus.js';
 
-import { isAemAssetsEnabled, tryRenderAemAssetsImage } from '@dropins/tools/lib/aem/assets.js';
 import { getMetadata } from '../../scripts/aem.js';
+import { hydrateProductCard, needsProductCardFallback } from '../../scripts/product-search-fallback.js';
 import { loadFragment } from '../fragment/fragment.js';
 import { fetchPlaceholders, getProductLink, rootLink } from '../../scripts/commerce.js';
 
@@ -129,23 +129,114 @@ const subMenuHeader = document.createElement('div');
 subMenuHeader.classList.add('submenu-header');
 subMenuHeader.innerHTML = '<h5 class="back-link">All Categories</h5><hr />';
 
-function renderStandardProductImage(ctx, href) {
+function formatCurrency(amount) {
+  if (!amount) {
+    return '';
+  }
+
+  return new Intl.NumberFormat(undefined, {
+    style: 'currency',
+    currency: amount.currency || 'USD',
+  }).format(amount.value ?? 0);
+}
+
+function getDisplayName(product) {
+  return product.name || product.sku || '';
+}
+
+function getImageSource(product, defaultImageProps) {
+  return product.images?.[0]?.url || defaultImageProps.src || '';
+}
+
+function renderProductNameSlot(ctx) {
+  const anchor = document.createElement('a');
+  const updateName = (product) => {
+    anchor.href = getProductLink(product.urlKey, product.sku);
+    anchor.textContent = getDisplayName(product);
+  };
+
+  updateName(ctx.product);
+  ctx.replaceWith(anchor);
+
+  if (needsProductCardFallback(ctx.product)) {
+    hydrateProductCard(ctx.product).then(updateName);
+  }
+}
+
+function renderProductPriceSlot(ctx) {
+  const wrapper = document.createElement('div');
+  const finalPrice = document.createElement('span');
+  const regularPrice = document.createElement('span');
+
+  wrapper.className = 'product-price';
+  finalPrice.className = 'regular-price-normal';
+  regularPrice.className = 'special-price-crossed';
+
+  const updatePrice = (product) => {
+    const finalAmount = product.price?.final?.amount
+      || product.priceRange?.minimum?.final?.amount;
+    const regularAmount = product.price?.regular?.amount
+      || product.priceRange?.minimum?.regular?.amount;
+
+    finalPrice.textContent = formatCurrency(finalAmount);
+    regularPrice.textContent = '';
+
+    if (regularAmount && finalAmount && regularAmount.value > finalAmount.value) {
+      regularPrice.textContent = formatCurrency(regularAmount);
+    }
+
+    wrapper.replaceChildren(finalPrice);
+    if (regularPrice.textContent) {
+      wrapper.append(regularPrice);
+    }
+  };
+
+  updatePrice(ctx.product);
+  ctx.replaceWith(wrapper);
+
+  if (needsProductCardFallback(ctx.product)) {
+    hydrateProductCard(ctx.product).then(updatePrice);
+  }
+}
+
+function renderStandardProductImage(ctx, product) {
   const { defaultImageProps } = ctx;
   const anchorWrapper = document.createElement('a');
-  anchorWrapper.href = href;
-
   const image = document.createElement('img');
-  if (defaultImageProps.alt) image.alt = defaultImageProps.alt;
-  if (defaultImageProps.title) image.title = defaultImageProps.title;
-  if (defaultImageProps.width) image.width = defaultImageProps.width;
-  if (defaultImageProps.height) image.height = defaultImageProps.height;
-  if (defaultImageProps.loading) image.loading = defaultImageProps.loading;
-  if (defaultImageProps.src) image.src = defaultImageProps.src;
-  if (defaultImageProps.srcSet) image.srcset = defaultImageProps.srcSet;
-  image.className = 'dropin-image';
+
+  const updateImage = (nextProduct) => {
+    const imageSource = getImageSource(nextProduct, defaultImageProps);
+    anchorWrapper.href = getProductLink(nextProduct.urlKey, nextProduct.sku);
+
+    if (defaultImageProps.alt || getDisplayName(nextProduct)) {
+      image.alt = defaultImageProps.alt || getDisplayName(nextProduct);
+    }
+
+    if (defaultImageProps.title || getDisplayName(nextProduct)) {
+      image.title = defaultImageProps.title || getDisplayName(nextProduct);
+    }
+
+    if (defaultImageProps.width) image.width = defaultImageProps.width;
+    if (defaultImageProps.height) image.height = defaultImageProps.height;
+    if (defaultImageProps.loading) image.loading = defaultImageProps.loading;
+    if (defaultImageProps.srcSet) image.srcset = defaultImageProps.srcSet;
+    image.className = 'dropin-image';
+
+    if (imageSource) {
+      image.src = imageSource;
+    } else {
+      image.removeAttribute('src');
+    }
+  };
+
+  updateImage(product);
 
   anchorWrapper.append(image);
   ctx.replaceWith(anchorWrapper);
+
+  if (needsProductCardFallback(product)) {
+    hydrateProductCard(product).then(updateImage);
+  }
 }
 
 /**
@@ -404,31 +495,10 @@ export default async function decorate(block) {
           },
           slots: {
             ProductImage: (ctx) => {
-              const { product, defaultImageProps } = ctx;
-              const productLink = getProductLink(product.urlKey, product.sku);
-
-              if (!defaultImageProps.src || !isAemAssetsEnabled()) {
-                renderStandardProductImage(ctx, productLink);
-                return;
-              }
-
-              const anchorWrapper = document.createElement('a');
-              anchorWrapper.href = productLink;
-
-              tryRenderAemAssetsImage(ctx, {
-                alias: product.sku,
-                imageProps: defaultImageProps,
-                wrapper: anchorWrapper,
-                params: {
-                  width: defaultImageProps.width,
-                  height: defaultImageProps.height,
-                },
-              });
-
-              if (!anchorWrapper.firstElementChild) {
-                renderStandardProductImage(ctx, productLink);
-              }
+              renderStandardProductImage(ctx, ctx.product);
             },
+            ProductName: renderProductNameSlot,
+            ProductPrice: renderProductPriceSlot,
             Footer: async (ctx) => {
               // View all results button
               const viewAllResultsWrapper = document.createElement('div');
