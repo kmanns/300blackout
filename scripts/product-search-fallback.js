@@ -41,6 +41,14 @@ const PRODUCT_CARD_FALLBACK_QUERY = `
 `;
 
 const hydratedProducts = new Map();
+
+function updateDebugState(nextState) {
+  window.__searchFallbackDebug = {
+    ...(window.__searchFallbackDebug || {}),
+    ...nextState,
+    updatedAt: new Date().toISOString(),
+  };
+}
 function normalizeImageUrl(url) {
   if (!url) return '';
   return url.replace(/^https?:\/\//, '//');
@@ -123,8 +131,16 @@ function mapFallbackProduct(item, product) {
 
 async function fetchFallbackProducts(skus) {
   const uncachedSkus = skus.filter((sku) => !hydratedProducts.has(sku));
+  updateDebugState({
+    requestedSkus: skus,
+    uncachedSkus,
+  });
 
   if (uncachedSkus.length > 0) {
+    updateDebugState({
+      fallbackFetchStarted: true,
+      fallbackFetchSkus: uncachedSkus,
+    });
     const request = CORE_FETCH_GRAPHQL.fetchGraphQl(PRODUCT_CARD_FALLBACK_QUERY, {
       variables: { skus: uncachedSkus },
       cache: 'no-cache',
@@ -135,6 +151,10 @@ async function fetchFallbackProducts(skus) {
 
       const items = response?.data?.products?.items || [];
       const itemMap = new Map(items.map((item) => [item.sku, item]));
+      updateDebugState({
+        fallbackFetchStarted: false,
+        fallbackFetchReturnedSkus: items.map(({ sku }) => sku),
+      });
 
       uncachedSkus.forEach((sku) => {
         hydratedProducts.set(sku, itemMap.get(sku) || null);
@@ -142,6 +162,10 @@ async function fetchFallbackProducts(skus) {
 
       return itemMap;
     }).catch((error) => {
+      updateDebugState({
+        fallbackFetchStarted: false,
+        fallbackFetchError: error.message,
+      });
       console.warn('Failed to hydrate fallback search results', error);
       uncachedSkus.forEach((sku) => {
         hydratedProducts.set(sku, null);
@@ -178,6 +202,13 @@ export async function hydrateProductSearchResponse(request, response) {
     .map(({ productView }) => productView)
     .filter(needsProductCardFallback);
 
+  updateDebugState({
+    interceptedSearchSkus: searchItems
+      .map(({ productView }) => productView?.sku)
+      .filter(Boolean),
+    productsNeedingHydration: productsToHydrate.map(({ sku }) => sku),
+  });
+
   if (productsToHydrate.length === 0) {
     return response;
   }
@@ -198,6 +229,12 @@ export async function hydrateProductSearchResponse(request, response) {
       ...item,
       productView: mapFallbackProduct(fallbackProduct, product),
     };
+  });
+
+  updateDebugState({
+    mergedSkus: response.data.productSearch.items
+      .filter(({ productView }) => productView?.name && productView?.urlKey)
+      .map(({ productView }) => productView.sku),
   });
 
   return response;
