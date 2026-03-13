@@ -125,11 +125,11 @@ function mapFallbackProduct(item, product) {
 
 async function fetchFallbackProducts(skus) {
   const uncachedSkus = skus.filter((sku) => !hydratedProducts.has(sku));
-  console.debug(`${DEBUG_PREFIX} requested SKUs`, skus);
-  console.debug(`${DEBUG_PREFIX} uncached SKUs`, uncachedSkus);
+  console.log(`${DEBUG_PREFIX} requested SKUs`, skus);
+  console.log(`${DEBUG_PREFIX} uncached SKUs`, uncachedSkus);
 
   if (uncachedSkus.length > 0) {
-    console.debug(`${DEBUG_PREFIX} fetching core product fallback`, { skus: uncachedSkus });
+    console.log(`${DEBUG_PREFIX} fetching core product fallback`, { skus: uncachedSkus });
     const request = CORE_FETCH_GRAPHQL.fetchGraphQl(PRODUCT_CARD_FALLBACK_QUERY, {
       variables: { skus: uncachedSkus },
       cache: 'no-cache',
@@ -140,7 +140,7 @@ async function fetchFallbackProducts(skus) {
 
       const items = response?.data?.products?.items || [];
       const itemMap = new Map(items.map((item) => [item.sku, item]));
-      console.debug(`${DEBUG_PREFIX} core product fallback response`, {
+      console.log(`${DEBUG_PREFIX} core product fallback response`, {
         requested: uncachedSkus,
         returned: items.map(({ sku }) => sku),
       });
@@ -183,7 +183,7 @@ export async function hydrateProductSearchResponse(request, response) {
     return response;
   }
 
-  console.debug(`${DEBUG_PREFIX} intercepted productSearch response`, {
+  console.log(`${DEBUG_PREFIX} intercepted productSearch response`, {
     itemCount: searchItems.length,
     skus: searchItems.map(({ productView }) => productView?.sku).filter(Boolean),
   });
@@ -192,7 +192,7 @@ export async function hydrateProductSearchResponse(request, response) {
     .map(({ productView }) => productView)
     .filter(needsProductCardFallback);
 
-  console.debug(`${DEBUG_PREFIX} products needing hydration`, {
+  console.log(`${DEBUG_PREFIX} products needing hydration`, {
     skus: productsToHydrate.map(({ sku }) => sku),
   });
 
@@ -218,7 +218,7 @@ export async function hydrateProductSearchResponse(request, response) {
     };
   });
 
-  console.debug(`${DEBUG_PREFIX} merged hydrated products`, {
+  console.log(`${DEBUG_PREFIX} merged hydrated products`, {
     mergedSkus: response.data.productSearch.items
       .filter(({ productView }) => productView?.name && productView?.urlKey)
       .map(({ productView }) => productView.sku),
