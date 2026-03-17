@@ -1,11 +1,89 @@
-import {
-  fetchProductData,
-  setEndpoint as setPdpEndpoint,
-} from '@dropins/storefront-pdp/api.js';
 import { CS_FETCH_GRAPHQL } from './commerce.js';
 
+const PRODUCT_CARD_FALLBACK_QUERY = `
+  query PRODUCT_CARD_FALLBACK($skus: [String]) {
+    products(skus: $skus) {
+      __typename
+      id
+      sku
+      name
+      shortDescription
+      metaDescription
+      metaKeyword
+      metaTitle
+      description
+      inStock
+      addToCartAllowed
+      url
+      urlKey
+      externalId
+      images(roles: []) {
+        url
+        label
+        roles
+      }
+      attributes(roles: []) {
+        name
+        label
+        value
+        roles
+      }
+      ... on SimpleProductView {
+        price {
+          roles
+          regular {
+            amount {
+              value
+              currency
+            }
+          }
+          final {
+            amount {
+              value
+              currency
+            }
+          }
+        }
+      }
+      ... on ComplexProductView {
+        priceRange {
+          maximum {
+            final {
+              amount {
+                value
+                currency
+              }
+            }
+            regular {
+              amount {
+                value
+                currency
+              }
+            }
+            roles
+          }
+          minimum {
+            final {
+              amount {
+                value
+                currency
+              }
+            }
+            regular {
+              amount {
+                value
+                currency
+              }
+            }
+            roles
+          }
+        }
+      }
+    }
+  }
+`;
+
 const hydratedProducts = new Map();
-let pdpEndpointInitialized = false;
 
 function updateDebugState(nextState) {
   window.__searchFallbackDebug = {
@@ -18,15 +96,6 @@ function updateDebugState(nextState) {
 function normalizeImageUrl(url) {
   if (!url) return '';
   return url.replace(/^https?:\/\//, '//');
-}
-
-function ensurePdpEndpoint() {
-  if (pdpEndpointInitialized) {
-    return;
-  }
-
-  setPdpEndpoint(CS_FETCH_GRAPHQL);
-  pdpEndpointInitialized = true;
 }
 
 export function needsProductCardFallback(product) {
@@ -44,24 +113,8 @@ export function needsProductCardFallback(product) {
 function mapFallbackProduct(item, product) {
   const fallbackImages = item.images?.map((image) => ({
     ...image,
-    roles: image.roles || ['image'],
     url: normalizeImageUrl(image.url),
   })) || [];
-
-  const finalAmount = item.prices?.final?.amount;
-  const regularAmount = item.prices?.regular?.amount;
-  const currency = item.prices?.final?.currency || item.prices?.regular?.currency || 'USD';
-
-  const price = typeof finalAmount === 'number' ? {
-    final: { amount: { value: finalAmount, currency } },
-    regular: {
-      amount: {
-        value: typeof regularAmount === 'number' ? regularAmount : finalAmount,
-        currency,
-      },
-    },
-    roles: [],
-  } : product.price;
 
   return {
     ...product,
@@ -70,10 +123,10 @@ function mapFallbackProduct(item, product) {
     urlKey: item.urlKey || product.urlKey || '',
     images: fallbackImages.length ? fallbackImages : (product.images || []),
     inStock: typeof item.inStock === 'boolean' ? item.inStock : product.inStock,
-    __typename: product.__typename || 'SimpleProductView',
-    typename: product.typename || 'SimpleProductView',
-    price,
-    priceRange: product.priceRange,
+    __typename: item.__typename || product.__typename || 'SimpleProductView',
+    typename: item.__typename || product.typename || 'SimpleProductView',
+    price: item.price || product.price,
+    priceRange: item.priceRange || product.priceRange,
   };
 }
 
@@ -85,20 +138,22 @@ async function fetchFallbackProducts(skus) {
   });
 
   if (uncachedSkus.length > 0) {
-    ensurePdpEndpoint();
-
     updateDebugState({
       fallbackFetchStarted: true,
       fallbackFetchSkus: uncachedSkus,
     });
 
-    const request = Promise.all(
-      uncachedSkus.map(async (sku) => {
-        const product = await fetchProductData(sku, { skipTransform: true });
-        return [sku, product];
-      }),
-    ).then((entries) => {
-      const itemMap = new Map(entries.filter(([, item]) => item?.sku));
+    const request = CS_FETCH_GRAPHQL.fetchGraphQl(PRODUCT_CARD_FALLBACK_QUERY, {
+      method: 'POST',
+      variables: { skus: uncachedSkus },
+      cache: 'no-cache',
+    }).then((response) => {
+      if (response?.errors?.length) {
+        throw new Error(response.errors.map((error) => error.message).join(' '));
+      }
+
+      const products = response?.data?.products || [];
+      const itemMap = new Map(products.filter((item) => item?.sku).map((item) => [item.sku, item]));
       updateDebugState({
         fallbackFetchStarted: false,
         fallbackFetchReturnedSkus: [...itemMap.keys()],
