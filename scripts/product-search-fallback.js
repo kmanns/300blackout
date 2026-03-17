@@ -131,7 +131,13 @@ function mapFallbackProduct(item, product) {
 }
 
 async function fetchFallbackProducts(skus) {
-  const uncachedSkus = skus.filter((sku) => !hydratedProducts.has(sku));
+  const uncachedSkus = skus.filter((sku) => {
+    if (!hydratedProducts.has(sku)) {
+      return true;
+    }
+
+    return hydratedProducts.get(sku) === null;
+  });
   updateDebugState({
     requestedSkus: skus,
     uncachedSkus,
@@ -160,7 +166,12 @@ async function fetchFallbackProducts(skus) {
       });
 
       uncachedSkus.forEach((sku) => {
-        hydratedProducts.set(sku, itemMap.get(sku) || null);
+        const product = itemMap.get(sku);
+        if (product) {
+          hydratedProducts.set(sku, product);
+        } else {
+          hydratedProducts.delete(sku);
+        }
       });
 
       return itemMap;
@@ -171,7 +182,7 @@ async function fetchFallbackProducts(skus) {
       });
       console.warn('Failed to hydrate fallback search results', error);
       uncachedSkus.forEach((sku) => {
-        hydratedProducts.set(sku, null);
+        hydratedProducts.delete(sku);
       });
       return new Map();
     });
@@ -184,7 +195,11 @@ async function fetchFallbackProducts(skus) {
   const resolvedEntries = await Promise.all(skus.map(async (sku) => {
     const cachedValue = hydratedProducts.get(sku);
     const resolvedValue = cachedValue instanceof Promise ? await cachedValue : cachedValue;
-    hydratedProducts.set(sku, resolvedValue || null);
+    if (resolvedValue) {
+      hydratedProducts.set(sku, resolvedValue);
+    } else {
+      hydratedProducts.delete(sku);
+    }
     return [sku, resolvedValue || null];
   }));
 
