@@ -16,6 +16,7 @@ import { events } from '@dropins/tools/event-bus.js';
 // AEM
 import { readBlockConfig } from '../../scripts/aem.js';
 import { fetchPlaceholders, getProductLink } from '../../scripts/commerce.js';
+import { hydrateProductCard, needsProductCardFallback } from '../../scripts/product-search-fallback.js';
 
 // Initializers
 import '../../scripts/initializers/search.js';
@@ -25,26 +26,101 @@ function getImageSource(product, defaultImageProps) {
   return product.images?.[0]?.url || defaultImageProps.src || '';
 }
 
+function formatCurrency(amount) {
+  if (!amount) {
+    return '';
+  }
+
+  return new Intl.NumberFormat(undefined, {
+    style: 'currency',
+    currency: amount.currency || 'USD',
+  }).format(amount.value ?? 0);
+}
+
+function renderProductNameSlot(ctx) {
+  const anchor = document.createElement('a');
+  const updateName = (product) => {
+    anchor.href = getProductLink(product.urlKey, product.sku);
+    anchor.textContent = product.name || product.sku || '';
+  };
+
+  updateName(ctx.product);
+  ctx.replaceWith(anchor);
+
+  if (needsProductCardFallback(ctx.product)) {
+    hydrateProductCard(ctx.product).then(updateName);
+  }
+}
+
+function renderProductPriceSlot(ctx) {
+  const anchor = document.createElement('a');
+  const wrapper = document.createElement('div');
+  const finalPrice = document.createElement('span');
+  const regularPrice = document.createElement('span');
+
+  wrapper.className = 'product-price';
+  finalPrice.className = 'regular-price-normal';
+  regularPrice.className = 'special-price-crossed';
+  anchor.append(wrapper);
+
+  const updatePrice = (product) => {
+    const finalAmount = product.price?.final?.amount
+      || product.priceRange?.minimum?.final?.amount;
+    const regularAmount = product.price?.regular?.amount
+      || product.priceRange?.minimum?.regular?.amount;
+
+    anchor.href = getProductLink(product.urlKey, product.sku);
+    wrapper.replaceChildren();
+
+    if (finalAmount) {
+      finalPrice.textContent = formatCurrency(finalAmount);
+      wrapper.append(finalPrice);
+    }
+
+    if (regularAmount && finalAmount && regularAmount.value > finalAmount.value) {
+      regularPrice.textContent = formatCurrency(regularAmount);
+      wrapper.append(regularPrice);
+    }
+  };
+
+  updatePrice(ctx.product);
+  ctx.replaceWith(anchor);
+
+  if (needsProductCardFallback(ctx.product)) {
+    hydrateProductCard(ctx.product).then(updatePrice);
+  }
+}
+
 function renderStandardProductImage(ctx) {
   const { defaultImageProps } = ctx;
   const anchorWrapper = document.createElement('a');
   const image = document.createElement('img');
-  const imageSource = getImageSource(ctx.product, defaultImageProps);
+  const updateImage = (product) => {
+    const imageSource = getImageSource(product, defaultImageProps);
 
-  anchorWrapper.href = getProductLink(ctx.product.urlKey, ctx.product.sku);
-  image.alt = defaultImageProps.alt || ctx.product.name || ctx.product.sku || '';
-  image.title = defaultImageProps.title || ctx.product.name || ctx.product.sku || '';
-  if (defaultImageProps.width) image.width = defaultImageProps.width;
-  if (defaultImageProps.height) image.height = defaultImageProps.height;
-  if (defaultImageProps.loading) image.loading = defaultImageProps.loading;
-  if (defaultImageProps.srcSet) image.srcset = defaultImageProps.srcSet;
-  image.className = 'dropin-image';
-  if (imageSource) {
-    image.src = imageSource;
-  }
+    anchorWrapper.href = getProductLink(product.urlKey, product.sku);
+    image.alt = defaultImageProps.alt || product.name || product.sku || '';
+    image.title = defaultImageProps.title || product.name || product.sku || '';
+    if (defaultImageProps.width) image.width = defaultImageProps.width;
+    if (defaultImageProps.height) image.height = defaultImageProps.height;
+    if (defaultImageProps.loading) image.loading = defaultImageProps.loading;
+    if (defaultImageProps.srcSet) image.srcset = defaultImageProps.srcSet;
+    image.className = 'dropin-image';
+    if (imageSource) {
+      image.src = imageSource;
+    } else {
+      image.removeAttribute('src');
+    }
+  };
+
+  updateImage(ctx.product);
 
   anchorWrapper.append(image);
   ctx.replaceWith(anchorWrapper);
+
+  if (needsProductCardFallback(ctx.product)) {
+    hydrateProductCard(ctx.product).then(updateImage);
+  }
 }
 
 export default async function decorate(block) {
@@ -173,6 +249,8 @@ export default async function decorate(block) {
         ProductImage: (ctx) => {
           renderStandardProductImage(ctx);
         },
+        ProductName: renderProductNameSlot,
+        ProductPrice: renderProductPriceSlot,
         ProductActions: (ctx) => {
           const actionsWrapper = document.createElement('div');
           actionsWrapper.className = 'product-discovery-product-actions';

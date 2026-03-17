@@ -77,7 +77,7 @@ function mapTypeName(typeName, fallbackTypeName) {
   return 'ComplexProductView';
 }
 
-function needsProductCardFallback(product) {
+export function needsProductCardFallback(product) {
   return Boolean(
     product?.sku
     && (
@@ -186,6 +186,21 @@ async function fetchFallbackProducts(skus) {
   }));
 
   return new Map(resolvedEntries);
+}
+
+export async function hydrateProductCard(product) {
+  if (!needsProductCardFallback(product)) {
+    return product;
+  }
+
+  const fallbackMap = await fetchFallbackProducts([product.sku]);
+  const fallbackProduct = fallbackMap.get(product.sku);
+
+  if (!fallbackProduct) {
+    return product;
+  }
+
+  return mapFallbackProduct(fallbackProduct, product);
 }
 
 export async function hydrateProductSearchResponse(request, response) {
