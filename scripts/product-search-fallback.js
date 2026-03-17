@@ -84,6 +84,7 @@ const PRODUCT_CARD_FALLBACK_QUERY = `
 `;
 
 const hydratedProducts = new Map();
+let metadataEntriesPromise;
 
 function updateDebugState(nextState) {
   window.__searchFallbackDebug = {
@@ -96,6 +97,88 @@ function updateDebugState(nextState) {
 function normalizeImageUrl(url) {
   if (!url) return '';
   return url.replace(/^https?:\/\//, '//');
+}
+
+async function getMetadataEntries() {
+  if (!metadataEntriesPromise) {
+    metadataEntriesPromise = fetch('/metadata.json', { cache: 'no-cache' })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Metadata request failed: ${response.status}`);
+        }
+
+        return response.json();
+      })
+      .then((payload) => payload?.data?.data || payload?.data || [])
+      .catch((error) => {
+        updateDebugState({ metadataFallbackError: error.message });
+        return [];
+      });
+  }
+
+  return metadataEntriesPromise;
+}
+
+function createAmount(amount, currency = 'USD') {
+  if (typeof amount !== 'number') {
+    return null;
+  }
+
+  return { value: amount, currency };
+}
+
+function mapMetadataEntry(entry, sku) {
+  if (!entry) {
+    return null;
+  }
+
+  let jsonLd = null;
+  try {
+    jsonLd = entry['json-ld'] ? JSON.parse(entry['json-ld']) : null;
+  } catch (error) {
+    updateDebugState({ metadataJsonLdError: error.message });
+  }
+
+  const offers = Array.isArray(jsonLd?.offers) ? jsonLd.offers[0] : jsonLd?.offers;
+  const amount = createAmount(Number(offers?.price), offers?.priceCurrency || 'USD');
+  const url = entry.URL || jsonLd?.url || entry['og:url'] || '';
+  const imageUrl = entry['og:image'] || entry['og:image:secure_url'] || jsonLd?.image || '';
+
+  return {
+    __typename: 'SimpleProductView',
+    sku: entry.sku || sku,
+    name: entry.title || entry['og:title'] || jsonLd?.name || sku,
+    url,
+    urlKey: url.split('/').filter(Boolean).slice(-2, -1)[0] || '',
+    images: imageUrl ? [{ url: normalizeImageUrl(imageUrl), label: entry.title || sku, roles: ['image'] }] : [],
+    price: amount ? {
+      final: { amount },
+      regular: { amount },
+      roles: [],
+    } : null,
+  };
+}
+
+async function fetchMetadataFallbackProducts(skus) {
+  const entries = await getMetadataEntries();
+  const entryMap = new Map(
+    entries
+      .filter((entry) => entry?.sku)
+      .map((entry) => [String(entry.sku).toLowerCase(), entry]),
+  );
+
+  const products = new Map(skus.map((sku) => [
+    sku,
+    mapMetadataEntry(entryMap.get(String(sku).toLowerCase()), sku),
+  ]));
+
+  updateDebugState({
+    metadataFallbackReturnedSkus: [...products.entries()]
+      .filter(([, product]) => product?.sku)
+      .map(([sku]) => sku),
+  });
+
+  return products;
 }
 
 export function needsProductCardFallback(product) {
@@ -157,6 +240,11 @@ async function fetchFallbackProducts(skus) {
 
       const products = response?.data?.products || [];
       const itemMap = new Map(products.filter((item) => item?.sku).map((item) => [item.sku, item]));
+
+      if (!itemMap.size) {
+        return fetchMetadataFallbackProducts(uncachedSkus);
+      }
+
       updateDebugState({
         fallbackFetchStarted: false,
         fallbackFetchReturnedSkus: [...itemMap.keys()],
@@ -178,7 +266,7 @@ async function fetchFallbackProducts(skus) {
         fallbackFetchError: error.message,
       });
       console.warn('Failed to hydrate fallback search results', error);
-      return new Map();
+      return fetchMetadataFallbackProducts(uncachedSkus);
     });
 
     const itemMap = await request;
