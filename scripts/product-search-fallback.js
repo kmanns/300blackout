@@ -2,36 +2,71 @@ import { CORE_FETCH_GRAPHQL } from './commerce.js';
 
 const PRODUCT_CARD_FALLBACK_QUERY = `
   query PRODUCT_CARD_FALLBACK($skus: [String!]) {
-    products(filter: { sku: { in: $skus } }) {
+    productSearch(
+      phrase: ""
+      page_size: 50
+      current_page: 1
+      filter: [{ attribute: "sku", in: $skus }]
+    ) {
       items {
-        __typename
-        sku
-        name
-        url_key
-        small_image {
+        productView {
+          __typename
+          sku
+          name
+          inStock
           url
-          label
-        }
-        stock_status
-        price_range {
-          minimum_price {
-            final_price {
-              value
-              currency
-            }
-            regular_price {
-              value
-              currency
+          urlKey
+          images(roles: ["image"]) {
+            label
+            url
+            roles
+          }
+          ... on SimpleProductView {
+            price {
+              final {
+                amount {
+                  value
+                  currency
+                }
+              }
+              regular {
+                amount {
+                  value
+                  currency
+                }
+              }
             }
           }
-          maximum_price {
-            final_price {
-              value
-              currency
-            }
-            regular_price {
-              value
-              currency
+          ... on ComplexProductView {
+            priceRange {
+              maximum {
+                final {
+                  amount {
+                    value
+                    currency
+                  }
+                }
+                regular {
+                  amount {
+                    value
+                    currency
+                  }
+                }
+              }
+              minimum {
+                final {
+                  amount {
+                    value
+                    currency
+                  }
+                }
+                regular {
+                  amount {
+                    value
+                    currency
+                  }
+                }
+              }
             }
           }
         }
@@ -54,29 +89,6 @@ function normalizeImageUrl(url) {
   return url.replace(/^https?:\/\//, '//');
 }
 
-function createAmount(price) {
-  if (!price) return undefined;
-
-  return {
-    value: price.value ?? 0,
-    currency: price.currency ?? 'USD',
-  };
-}
-
-function mapTypeName(typeName, fallbackTypeName) {
-  if (!typeName) return fallbackTypeName;
-
-  if (
-    typeName === 'SimpleProduct'
-    || typeName === 'VirtualProduct'
-    || typeName === 'DownloadableProduct'
-  ) {
-    return 'SimpleProductView';
-  }
-
-  return 'ComplexProductView';
-}
-
 export function needsProductCardFallback(product) {
   return Boolean(
     product?.sku
@@ -90,42 +102,21 @@ export function needsProductCardFallback(product) {
 }
 
 function mapFallbackProduct(item, product) {
-  const minFinal = createAmount(item.price_range?.minimum_price?.final_price);
-  const minRegular = createAmount(item.price_range?.minimum_price?.regular_price) || minFinal;
-  const maxFinal = createAmount(item.price_range?.maximum_price?.final_price) || minFinal;
-  const maxRegular = createAmount(item.price_range?.maximum_price?.regular_price)
-    || maxFinal
-    || minRegular;
-  const imageUrl = normalizeImageUrl(item.small_image?.url);
-  const imageLabel = item.small_image?.label || item.name || product.sku || '';
+  const fallbackImages = item.images?.map((image) => ({
+    ...image,
+    url: normalizeImageUrl(image.url),
+  })) || [];
 
   return {
     ...product,
     name: item.name || product.name || product.sku || '',
-    url: item.url_key ? `/${item.url_key}` : (product.url || ''),
-    urlKey: item.url_key || product.urlKey || '',
-    images: imageUrl ? [{
-      label: imageLabel,
-      roles: ['image'],
-      url: imageUrl,
-    }] : (product.images || []),
-    inStock: item.stock_status ? item.stock_status === 'IN_STOCK' : product.inStock,
-    typename: mapTypeName(item.__typename, product.typename),
-    price: minFinal ? {
-      final: { amount: minFinal },
-      regular: { amount: minRegular },
-      roles: [],
-    } : product.price,
-    priceRange: minFinal ? {
-      minimum: {
-        final: { amount: minFinal },
-        regular: { amount: minRegular },
-      },
-      maximum: {
-        final: { amount: maxFinal || minFinal },
-        regular: { amount: maxRegular || minRegular },
-      },
-    } : product.priceRange,
+    url: item.url || product.url || '',
+    urlKey: item.urlKey || product.urlKey || '',
+    images: fallbackImages.length ? fallbackImages : (product.images || []),
+    inStock: typeof item.inStock === 'boolean' ? item.inStock : product.inStock,
+    typename: item.__typename || product.typename,
+    price: item.price || product.price,
+    priceRange: item.priceRange || product.priceRange,
   };
 }
 
@@ -149,11 +140,14 @@ async function fetchFallbackProducts(skus) {
         throw new Error(response.errors.map((error) => error.message).join(' '));
       }
 
-      const items = response?.data?.products?.items || [];
-      const itemMap = new Map(items.map((item) => [item.sku, item]));
+      const items = response?.data?.productSearch?.items || [];
+      const productViews = items
+        .map((item) => item.productView)
+        .filter(Boolean);
+      const itemMap = new Map(productViews.map((item) => [item.sku, item]));
       updateDebugState({
         fallbackFetchStarted: false,
-        fallbackFetchReturnedSkus: items.map(({ sku }) => sku),
+        fallbackFetchReturnedSkus: productViews.map(({ sku }) => sku),
       });
 
       uncachedSkus.forEach((sku) => {
