@@ -5,9 +5,9 @@ const CART_COMPAT_REPLACEMENTS = [
   [/grand_total_excluding_tax\s*\{[^}]*\}/g, 'grand_total_excluding_tax: subtotal_excluding_tax {\n      currency\n      value\n    }'],
   [/\s*applied_coupons\s*\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}\n/g, '\n'],
   [/\s*available_gift_wrappings\s*\{[^{}]*(?:\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}[^{}]*)*\}\n/g, '\n'],
-  [/\s*gift_wrapping\s*\{[^{}]*(?:\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}[^{}]*)*\}\n/g, '\n'],
-  [/\s*gift_message\s*\{[^{}]*(?:\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}[^{}]*)*\}\n/g, '\n'],
-  [/\s*available_gift_wrapping\s*\{[^{}]*(?:\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}[^{}]*)*\}\n/g, '\n'],
+  [/\n[ \t]*gift_wrapping\s*\{[^{}]*(?:\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}[^{}]*)*\}/g, ''],
+  [/\n[ \t]*gift_message\s*\{[^{}]*(?:\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}[^{}]*)*\}/g, ''],
+  [/\n[ \t]*available_gift_wrapping\s*\{[^{}]*(?:\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}[^{}]*)*\}/g, ''],
   [/\s*not_available_message\n/g, '\n'],
   [/\s*original_item_price\s*\{[^}]*\}\n/g, '\n'],
   [/\s*original_row_total\s*\{[^}]*\}\n/g, '\n'],
@@ -17,6 +17,9 @@ const CART_COMPAT_REPLACEMENTS = [
   [/(^|\n)([ \t]*)quantity([ \t]*)(?=\n|$)/gm, '$1'],
   [/gift_wrapping_available/g, 'gift_wrapping_available: gift_message_available'],
   [/\s*gift_wrapping_price\s*\{[^}]*\}\n/g, '\n'],
+  [/\n[ \t]*fragment GIFT_MESSAGE_FRAGMENT on GiftMessage \{[^{}]*\}/g, ''],
+  [/\n[ \t]*fragment GIFT_WRAPPING_FRAGMENT on GiftWrapping \{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}/g, ''],
+  [/\n[ \t]*fragment AVAILABLE_GIFT_WRAPPING_FRAGMENT on GiftWrapping \{[^{}]*(?:\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}[^{}]*)*\}/g, ''],
 ];
 
 function patchGraphQlQuery(query) {
