@@ -13,6 +13,7 @@ import {
   preloadFile,
 } from '../commerce.js';
 import { getMetadata } from '../aem.js';
+import { PRODUCT_SEARCH_OVERRIDES } from '../product-search-overrides.js';
 
 export const IMAGES_SIZES = {
   width: 960,
@@ -82,6 +83,7 @@ await initializeDropin(async () => {
   // Fetch product data
   const sku = getProductSku();
   const optionsUIDs = getOptionsUIDsFromUrl();
+  const overrideProduct = sku ? PRODUCT_SEARCH_OVERRIDES[String(sku).toLowerCase()] : null;
 
   // If we cannot find a sku, and we are not in UE, there's a problem.
   if (!sku && !IS_UE) {
@@ -89,7 +91,10 @@ await initializeDropin(async () => {
   }
 
   const [product, labels] = await Promise.all([
-    fetchProductData(sku, { optionsUIDs, skipTransform: true }).then(preloadImageMiddleware),
+    (overrideProduct
+      ? Promise.resolve(overrideProduct)
+      : fetchProductData(sku, { optionsUIDs, skipTransform: true }))
+      .then(preloadImageMiddleware),
     fetchPlaceholders('placeholders/pdp.json'),
   ]);
 
