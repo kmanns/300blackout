@@ -1,4 +1,5 @@
 import { CS_FETCH_GRAPHQL } from './commerce.js';
+import { PRODUCT_SEARCH_OVERRIDES } from './product-search-overrides.js';
 
 const PRODUCT_CARD_FALLBACK_QUERY = `
   query PRODUCT_CARD_FALLBACK($skus: [String]) {
@@ -182,6 +183,21 @@ async function fetchMetadataFallbackProducts(skus) {
   return products;
 }
 
+function fetchOverrideProducts(skus) {
+  const products = new Map(skus.map((sku) => [
+    sku,
+    PRODUCT_SEARCH_OVERRIDES[String(sku).toLowerCase()] || null,
+  ]));
+
+  updateDebugState({
+    manualOverrideReturnedSkus: [...products.entries()]
+      .filter(([, product]) => product?.sku)
+      .map(([sku]) => sku),
+  });
+
+  return products;
+}
+
 function extractText(documentRef, selector) {
   return documentRef.querySelector(selector)?.getAttribute('content')
     || documentRef.querySelector(selector)?.textContent
@@ -302,6 +318,23 @@ async function fetchFallbackProducts(skus) {
   });
 
   if (uncachedSkus.length > 0) {
+    const overrideMap = fetchOverrideProducts(uncachedSkus);
+    const overrideHits = [...overrideMap.values()].filter(Boolean).length;
+
+    if (overrideHits) {
+      uncachedSkus.forEach((sku) => {
+        const product = overrideMap.get(sku);
+        if (product) {
+          hydratedProducts.set(sku, product);
+        }
+      });
+
+      return new Map(skus.map((sku) => [
+        sku,
+        hydratedProducts.get(sku) || overrideMap.get(sku) || null,
+      ]));
+    }
+
     updateDebugState({
       fallbackFetchStarted: true,
       fallbackFetchSkus: uncachedSkus,
