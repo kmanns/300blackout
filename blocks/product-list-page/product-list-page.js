@@ -26,6 +26,10 @@ function getImageSource(product, defaultImageProps) {
   return product.images?.[0]?.url || defaultImageProps.src || '';
 }
 
+function getProductHref(product) {
+  return product.url || getProductLink(product.urlKey, product.sku);
+}
+
 function formatCurrency(amount) {
   if (!amount) {
     return '';
@@ -40,7 +44,7 @@ function formatCurrency(amount) {
 function renderProductNameSlot(ctx) {
   const anchor = document.createElement('a');
   const updateName = (product) => {
-    anchor.href = getProductLink(product.urlKey, product.sku);
+    anchor.href = getProductHref(product);
     anchor.textContent = product.name || product.sku || '';
   };
 
@@ -69,7 +73,7 @@ function renderProductPriceSlot(ctx) {
     const regularAmount = product.price?.regular?.amount
       || product.priceRange?.minimum?.regular?.amount;
 
-    anchor.href = getProductLink(product.urlKey, product.sku);
+    anchor.href = getProductHref(product);
     wrapper.replaceChildren();
 
     if (finalAmount) {
@@ -98,7 +102,7 @@ function renderStandardProductImage(ctx) {
   const updateImage = (product) => {
     const imageSource = getImageSource(product, defaultImageProps);
 
-    anchorWrapper.href = getProductLink(product.urlKey, product.sku);
+    anchorWrapper.href = getProductHref(product);
     image.alt = defaultImageProps.alt || product.name || product.sku || '';
     image.title = defaultImageProps.title || product.name || product.sku || '';
     if (defaultImageProps.width) image.width = defaultImageProps.width;
@@ -203,7 +207,7 @@ export default async function decorate(block) {
       UI.render(Button, {
         children: labels.Global?.AddProductToCart,
         icon: Icon({ source: 'Cart' }),
-        href: getProductLink(product.urlKey, product.sku),
+        href: getProductHref(product),
         variant: 'primary',
       })(button);
       return button;
@@ -244,7 +248,7 @@ export default async function decorate(block) {
     provider.render(Facets, {})($facets),
     // Product List
     provider.render(SearchResults, {
-      routeProduct: (product) => getProductLink(product.urlKey, product.sku),
+      routeProduct: (product) => getProductHref(product),
       slots: {
         ProductImage: (ctx) => {
           renderStandardProductImage(ctx);

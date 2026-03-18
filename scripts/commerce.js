@@ -691,6 +691,12 @@ export function getProductLink(urlKey, sku) {
  * @returns {string|null} The SKU from metadata or URL, or null if not found
  */
 export function getProductSku() {
+  const skuFromQuery = new URLSearchParams(window.location.search).get('sku');
+
+  if (skuFromQuery) {
+    return skuFromQuery;
+  }
+
   if (isProductTemplate() && (IS_UE || IS_DA)) {
     return getDefaultSkuFromBlock();
   }

@@ -133,6 +133,10 @@ function getImageSource(product, defaultImageProps) {
   return product.images?.[0]?.url || defaultImageProps.src || '';
 }
 
+function getProductHref(product) {
+  return product.url || getProductLink(product.urlKey, product.sku);
+}
+
 function formatCurrency(amount) {
   if (!amount) {
     return '';
@@ -147,7 +151,7 @@ function formatCurrency(amount) {
 function renderProductNameSlot(ctx) {
   const anchor = document.createElement('a');
   const updateName = (product) => {
-    anchor.href = getProductLink(product.urlKey, product.sku);
+    anchor.href = getProductHref(product);
     anchor.textContent = product.name || product.sku || '';
   };
 
@@ -176,7 +180,7 @@ function renderProductPriceSlot(ctx) {
     const regularAmount = product.price?.regular?.amount
       || product.priceRange?.minimum?.regular?.amount;
 
-    anchor.href = getProductLink(product.urlKey, product.sku);
+    anchor.href = getProductHref(product);
     wrapper.replaceChildren();
 
     if (finalAmount) {
@@ -205,7 +209,7 @@ function renderStandardProductImage(ctx) {
   const updateImage = (product) => {
     const imageSource = getImageSource(product, defaultImageProps);
 
-    anchorWrapper.href = getProductLink(product.urlKey, product.sku);
+    anchorWrapper.href = getProductHref(product);
     image.alt = defaultImageProps.alt || product.name || product.sku || '';
     image.title = defaultImageProps.title || product.name || product.sku || '';
     if (defaultImageProps.width) image.width = defaultImageProps.width;
@@ -480,7 +484,7 @@ export default async function decorate(block) {
         render.render(SearchResults, {
           skeletonCount: pageSize,
           scope: 'popover',
-          routeProduct: ({ urlKey, sku }) => getProductLink(urlKey, sku),
+          routeProduct: (product) => getProductHref(product),
           onSearchResult: (results) => {
             searchResult.style.display = results.length > 0 ? 'block' : 'none';
           },
