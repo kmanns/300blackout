@@ -5,10 +5,12 @@ import { initializers } from '@dropins/tools/initializer.js';
 import { isAemAssetsEnabled } from '@dropins/tools/lib/aem/assets.js';
 import { getConfigValue, getRootPath } from '@dropins/tools/lib/aem/configs.js';
 import { CORE_FETCH_GRAPHQL, CS_FETCH_GRAPHQL, fetchPlaceholders } from '../commerce.js';
+import { patchCoreGraphQlRequest } from '../core-graphql-compat.js';
 
 const DROPIN_WEBSITE_COOKIE = 'dropin_website_path';
 const getWebsitePath = () => getRootPath() || '/';
 const clearCookie = (name) => { document.cookie = `${name}=; path=/; Max-Age=0`; };
+let coreCompatibilityHookRegistered = false;
 
 export const getUserTokenCookie = () => getCookie('auth_dropin_user_token');
 
@@ -57,6 +59,11 @@ const setupAemAssetsImageParams = () => {
 
 export default async function initializeDropins() {
   const init = async () => {
+    if (!coreCompatibilityHookRegistered) {
+      CORE_FETCH_GRAPHQL.addBeforeHook(patchCoreGraphQlRequest);
+      coreCompatibilityHookRegistered = true;
+    }
+
     // Set Customer-Group-ID header
     if (getConfigValue('adobe-commerce-optimizer')) {
       events.on('auth/adobe-commerce-optimizer', setAdobeCommerceOptimizerHeader, { eager: true });
