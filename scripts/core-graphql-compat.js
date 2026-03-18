@@ -6,7 +6,7 @@ const CART_COMPAT_REPLACEMENTS = [
   [/\s*not_available_message\n/g, '\n'],
   [/\s*original_item_price\s*\{[^}]*\}\n/g, '\n'],
   [/\s*original_row_total\s*\{[^}]*\}\n/g, '\n'],
-  [/\s*quantity\n/g, '\n'],
+  [/(^|\n)([ \t]*)quantity([ \t]*)(?=\n|$)/gm, '$1'],
   [/gift_wrapping_available/g, 'gift_wrapping_available: gift_message_available'],
   [/\s*gift_wrapping_price\s*\{[^}]*\}\n/g, '\n'],
 ];
