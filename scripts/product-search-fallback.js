@@ -85,6 +85,7 @@ const PRODUCT_CARD_FALLBACK_QUERY = `
 
 const hydratedProducts = new Map();
 let metadataEntriesPromise;
+const productPageFallbacks = new Map();
 
 function updateDebugState(nextState) {
   window.__searchFallbackDebug = {
@@ -181,6 +182,83 @@ async function fetchMetadataFallbackProducts(skus) {
   return products;
 }
 
+function extractText(documentRef, selector) {
+  return documentRef.querySelector(selector)?.getAttribute('content')
+    || documentRef.querySelector(selector)?.textContent
+    || '';
+}
+
+function mapProductPageDocument(doc, sku, path) {
+  const jsonLdScript = doc.querySelector('script[type="application/ld+json"]');
+  let jsonLd = null;
+
+  try {
+    jsonLd = jsonLdScript?.textContent ? JSON.parse(jsonLdScript.textContent) : null;
+  } catch (error) {
+    updateDebugState({ productPageJsonLdError: error.message });
+  }
+
+  const offers = Array.isArray(jsonLd?.offers) ? jsonLd.offers[0] : jsonLd?.offers;
+  const amount = createAmount(Number(offers?.price), offers?.priceCurrency || 'USD');
+  const title = extractText(doc, 'meta[property="og:title"]') || doc.title;
+  const imageUrl = extractText(doc, 'meta[property="og:image"]') || jsonLd?.image || '';
+  const canonicalUrl = extractText(doc, 'meta[property="og:url"]') || path;
+
+  if (!title || /page not found/i.test(title)) {
+    return null;
+  }
+
+  return {
+    __typename: 'SimpleProductView',
+    sku,
+    name: title,
+    url: canonicalUrl,
+    urlKey: canonicalUrl.split('/').filter(Boolean).slice(-2, -1)[0] || '',
+    images: imageUrl ? [{ url: normalizeImageUrl(imageUrl), label: title, roles: ['image'] }] : [],
+    price: amount ? {
+      final: { amount },
+      regular: { amount },
+      roles: [],
+    } : null,
+  };
+}
+
+async function fetchProductPageFallbackProducts(skus) {
+  const results = await Promise.all(skus.map(async (sku) => {
+    if (productPageFallbacks.has(sku)) {
+      return [sku, productPageFallbacks.get(sku)];
+    }
+
+    const path = `/products/${sku}`;
+
+    try {
+      const response = await fetch(path, { cache: 'no-cache' });
+      if (!response.ok) {
+        productPageFallbacks.set(sku, null);
+        return [sku, null];
+      }
+
+      const html = await response.text();
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+      const product = mapProductPageDocument(doc, sku, path);
+      productPageFallbacks.set(sku, product);
+      return [sku, product];
+    } catch (error) {
+      updateDebugState({ productPageFallbackError: error.message });
+      productPageFallbacks.set(sku, null);
+      return [sku, null];
+    }
+  }));
+
+  const products = new Map(results);
+  updateDebugState({
+    productPageFallbackReturnedSkus: [...products.entries()]
+      .filter(([, product]) => product?.sku)
+      .map(([sku]) => sku),
+  });
+  return products;
+}
+
 export function needsProductCardFallback(product) {
   return Boolean(
     product?.sku
@@ -233,7 +311,7 @@ async function fetchFallbackProducts(skus) {
       method: 'POST',
       variables: { skus: uncachedSkus },
       cache: 'no-cache',
-    }).then((response) => {
+    }).then(async (response) => {
       if (response?.errors?.length) {
         throw new Error(response.errors.map((error) => error.message).join(' '));
       }
@@ -242,7 +320,15 @@ async function fetchFallbackProducts(skus) {
       const itemMap = new Map(products.filter((item) => item?.sku).map((item) => [item.sku, item]));
 
       if (!itemMap.size) {
-        return fetchMetadataFallbackProducts(uncachedSkus);
+        const metadataMap = await fetchMetadataFallbackProducts(uncachedSkus);
+        const metadataHits = [...metadataMap.values()].filter(Boolean).length;
+
+        if (metadataHits) {
+          updateDebugState({ fallbackFetchStarted: false });
+          return metadataMap;
+        }
+
+        return fetchProductPageFallbackProducts(uncachedSkus);
       }
 
       updateDebugState({
@@ -260,13 +346,21 @@ async function fetchFallbackProducts(skus) {
       });
 
       return itemMap;
-    }).catch((error) => {
+    }).catch(async (error) => {
       updateDebugState({
         fallbackFetchStarted: false,
         fallbackFetchError: error.message,
       });
       console.warn('Failed to hydrate fallback search results', error);
-      return fetchMetadataFallbackProducts(uncachedSkus);
+      const metadataMap = await fetchMetadataFallbackProducts(uncachedSkus);
+      const metadataHits = [...metadataMap.values()].filter(Boolean).length;
+
+      if (metadataHits) {
+        updateDebugState({ fallbackFetchStarted: false });
+        return metadataMap;
+      }
+
+      return fetchProductPageFallbackProducts(uncachedSkus);
     });
 
     const itemMap = await request;
