@@ -9,6 +9,8 @@ const CART_COMPAT_REPLACEMENTS = [
   [/\n[ \t]*gift_message\s*\{[^{}]*(?:\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}[^{}]*)*\}/g, ''],
   [/\n[ \t]*available_gift_wrapping\s*\{[^{}]*(?:\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}[^{}]*)*\}/g, ''],
   [/\s*not_available_message\n/g, '\n'],
+  [/original_item_price\s*\{[^}]*\}/g, 'original_item_price: price {\n      value\n      currency\n    }'],
+  [/original_row_total\s*\{[^}]*\}/g, 'original_row_total: row_total {\n      value\n      currency\n    }'],
   [/\s*custom_attributesV2\s*\([^)]*\)\s*\{[^{}]*(?:\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}[^{}]*)*\}\n/g, '\n'],
   [/\s*price_tiers\s*\{[^{}]*(?:\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}[^{}]*)*\}\n/g, '\n'],
   [/(^|\n)([ \t]*)quantity([ \t]*)(?=\n|$)/gm, '$1'],
